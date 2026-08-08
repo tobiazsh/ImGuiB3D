@@ -1,7 +1,8 @@
-<p style="text-align: center; font-weight: bold; font-size: xx-large">ImGui Blaze3D</p>
+<div align="center">
 
-<div style="display: flex; align-items: center; justify-content: space-around;"> 
-    <img style="border-radius: 1rem;" src="/res/imguib3d.png" alt="ImGui Blaze3D logo which features a yellow-black Minecraft blaze in an ImGui window on a stone background." width="200" height="200">
+# ImGui Blaze3D
+
+<img src="/res/imguib3d.png" alt="ImGui Blaze3D logo which features a yellow-black Minecraft blaze in an ImGui window on a stone background." width="200" height="200">
 </div>
 
 ImGui Blaze3D is a multi-version library, supported from 26.2 and onwards,
@@ -11,18 +12,24 @@ The library is designed to be used with the Fabric mod loader
 and provides a simple way to integrate ImGui into your Minecraft mods. It is compatible with multiple versions
 of Minecraft, making it easy to use in your projects.
 
-<p style="padding: 1.5rem; background: rgba(255,239,15,0.54); border-radius: 1rem; color: black;">
-    This mod is a dependency and not its own standalone mod.
-    <br/><br/>
-    If you're a player wanting to play a mod using this library, please download it from either
-    <a style="color: blue" href="https://www.example.com">Modrinth</a> or the
-    <a style="color: blue" href="https://www.example.com">release page</a> of this repository.
-    <br/><br/>
-    If you're a developer wanting to use this mod, please
-    refer to the <a style="color: blue" href="/documentation/README.md">documentation</a>,
-    which guides you through the process of installing and using this library within
-    your own project.
-</p>
+<hr/>
+
+<div>
+❗❗❗
+
+This mod is a dependency and not its own standalone mod.
+
+If you're a player wanting to play a mod using this library, please download it from either
+[Modrinth](https://www.example.com)
+[the release page](https://www.example.com) of this repository.
+If you're a developer wanting to use this mod, please
+refer to the [documentation](/documentation/README.md),
+which guides you through the process of installing and
+using this library within your own project.
+
+</div>
+
+<hr/>
 
 ## Demonstration
 <img src="/res/imgui_demo.png" alt="ImGui Demo window inside a Minecraft 26.2 window">
