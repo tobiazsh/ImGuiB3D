@@ -1,0 +1,11 @@
+# Project exclude paths
+/.gradle/
+/build/
+/buildSrc/.gradle/
+/buildSrc/build/
+/buildSrc/build/classes/kotlin/main/
+/common/build/
+/common/build/classes/java/main/
+/versions/26.2/build/
+/versions/26.2/build/classes/java/client/
+/versions/26.2/build/classes/java/main/
