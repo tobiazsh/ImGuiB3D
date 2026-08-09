@@ -21,7 +21,9 @@ package dev.tobiazsh.imguib3d.client.mixin.client;
 
 import dev.tobiazsh.imguib3d.client.ImGuiDrawable;
 import dev.tobiazsh.imguib3d.client.ImGuiImplementation;
-import dev.tobiazsh.imguib3d.client.ImGuiTest;
+import dev.tobiazsh.imguib3d.client.ImGuiTestOverlay;
+import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlay;
+import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlayManager;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
@@ -43,6 +45,9 @@ public class GameRendererMixin {
         if (minecraft.gui.screen() instanceof final ImGuiDrawable drawable)
             ImGuiImplementation.getInstance().draw(drawable);
 
-        ImGuiTest.render();
+        ImGuiImplementation.getInstance().draw(_ -> {
+            for (ImGuiOverlay overlay : ImGuiOverlayManager.getInstance().getOverlaysSorted())
+                overlay.draw();
+        });
     }
 }

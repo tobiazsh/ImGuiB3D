@@ -3,6 +3,7 @@
 
 package dev.tobiazsh.imguib3d.client;
 
+import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlayManager;
 import dev.tobiazsh.imguib3d.client.shader.ShaderManager;
 import dev.tobiazsh.imguib3d.client.shader.ShaderManagerImpl;
 import net.fabricmc.api.ClientModInitializer;
@@ -27,6 +28,9 @@ public class ImGuiB3DClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         LOGGER.info("Using ImGuiB3D version: {}", VERSION);
+        LOGGER.info("Registering ImGui Overlays...");
+
+        ImGuiOverlayManager.getInstance().add(new ImGuiTestOverlay());
     }
 
     private static String getVersion() {
