@@ -24,7 +24,7 @@ public final class ImGuiOverlayManager {
      * @param id The id for the overlay manager. Not used at the moment, but can be used to identify
      *           the manager in the future.
      */
-    public ImGuiOverlayManager(String id) {
+    public ImGuiOverlayManager(final String id) {
         this.id = id;
     }
 
@@ -50,7 +50,7 @@ public final class ImGuiOverlayManager {
      * Adds provided overlay.
      * @param overlay The new overlay to add.
      */
-    public void add(ImGuiOverlay overlay) {
+    public void add(final ImGuiOverlay overlay) {
         overlays.put(overlay.getId(), overlay);
     }
 
@@ -59,7 +59,7 @@ public final class ImGuiOverlayManager {
      * @param id The id of the overlay to search for.
      * @return {@link Optional<ImGuiOverlay>}, or {@link Optional#empty()} if no overlay with the provided id was found.
      */
-    public Optional<ImGuiOverlay> find(String id) {
+    public Optional<ImGuiOverlay> find(final String id) {
         return Optional.ofNullable(overlays.get(id));
     }
 
@@ -67,7 +67,7 @@ public final class ImGuiOverlayManager {
      * Remove the provided overlay from the map.
      * @param overlay The overlay to remove.
      */
-    public void remove(ImGuiOverlay overlay) {
+    public void remove(final ImGuiOverlay overlay) {
         remove(overlay.getId());
     }
 
@@ -75,7 +75,7 @@ public final class ImGuiOverlayManager {
      * Removes the provided overlay from the map.
      * @param id The id of the overlay to remove.
      */
-    public void remove(String id) {
+    public void remove(final String id) {
         overlays.remove(id);
     }
 
@@ -84,7 +84,7 @@ public final class ImGuiOverlayManager {
      * @param id The id of the overlay to look up.
      * @return `true` if the overlay is present, `false` otherwise.
      */
-    public boolean contains(String id) {
+    public boolean contains(final String id) {
         return overlays.containsKey(id);
     }
 
