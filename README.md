@@ -20,7 +20,7 @@ of Minecraft, making it easy to use in your projects.
 This mod is a dependency and not its own standalone mod.
 
 If you're a player wanting to play a mod using this library, please download it from either
-[Modrinth](https://www.example.com)
+[Modrinth](https://www.example.com) or 
 [the release page](https://www.example.com) of this repository.
 If you're a developer wanting to use this mod, please
 refer to the [documentation](/documentation/README.md),
