@@ -9,3 +9,5 @@
 /versions/26.2/build/
 /versions/26.2/build/classes/java/client/
 /versions/26.2/build/classes/java/main/
+/versions/26.2/run
+/.idea
