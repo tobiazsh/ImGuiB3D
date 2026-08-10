@@ -21,7 +21,6 @@ package dev.tobiazsh.imguib3d.client.mixin.client;
 
 import dev.tobiazsh.imguib3d.client.ImGuiDrawable;
 import dev.tobiazsh.imguib3d.client.ImGuiImplementation;
-import dev.tobiazsh.imguib3d.client.ImGuiTestOverlay;
 import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlay;
 import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlayManager;
 import net.minecraft.client.DeltaTracker;
