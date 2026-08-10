@@ -1,11 +1,12 @@
-package dev.tobiazsh.imguib3d.client;
+package dev.tobiazsh.imguib3d.test.client.overlay;
 
 import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlay;
 import imgui.ImGui;
 
-public class ImGuiTestOverlay implements ImGuiOverlay {
+public class TestOverlay implements ImGuiOverlay {
 
     private boolean isVisible = true;
+    private boolean showImage = false;
 
     @Override
     public boolean isVisible() {
@@ -14,9 +15,13 @@ public class ImGuiTestOverlay implements ImGuiOverlay {
 
     @Override
     public void draw() {
-        ImGui.showDemoWindow();
-        if (ImGui.begin("Hello from Blaze3D")) {
-            ImGui.text("Hello, world!");
+        if (ImGui.begin("Test Overlay")) {
+            ImGui.button((showImage ? "Hide" : "Show") + " highly confidential image (fr fr)");
+            ImGui.text("Hello");
+
+            if (showImage)
+                ImGui.image();
+
             ImGui.end();
         }
     }
@@ -28,6 +33,6 @@ public class ImGuiTestOverlay implements ImGuiOverlay {
 
     @Override
     public String getId() {
-        return "TestOverlay";
+        return "";
     }
 }

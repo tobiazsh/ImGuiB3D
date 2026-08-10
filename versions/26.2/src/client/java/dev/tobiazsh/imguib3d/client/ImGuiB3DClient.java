@@ -29,8 +29,6 @@ public class ImGuiB3DClient implements ClientModInitializer {
     public void onInitializeClient() {
         LOGGER.info("Using ImGuiB3D version: {}", VERSION);
         LOGGER.info("Registering ImGui Overlays...");
-
-        ImGuiOverlayManager.getInstance().add(new ImGuiTestOverlay());
     }
 
     private static String getVersion() {
@@ -44,7 +42,7 @@ public class ImGuiB3DClient implements ClientModInitializer {
                 .orElse("unknown");
     }
 
-    public static Collection<VersionPredicate> getMinecraftVersionPredicates() {
+    private static Collection<VersionPredicate> getMinecraftVersionPredicates() {
         final ModContainer imguib3d = FabricLoader.getInstance()
                 .getModContainer("imguib3d")
                 .orElseThrow(() -> new IllegalStateException("ImGuiB3D mod container not found"));
@@ -59,12 +57,23 @@ public class ImGuiB3DClient implements ClientModInitializer {
         return minecraft.getVersionRequirements();
     }
 
-    public static Version getMinecraftVersion() {
+    private static Version getMinecraftVersion() {
         final ModContainer minecraft = FabricLoader.getInstance()
                 .getModContainer(MINECRAFT_DEPENDENCY_ID)
                 .orElseThrow(() -> new IllegalStateException("Minecraft mod container not found"));
 
         return minecraft.getMetadata().getVersion();
+    }
+
+    public static boolean isMCVersionCompatible() {
+        final Version minecraftVersion = ImGuiB3DClient.getMinecraftVersion();
+
+        for (VersionPredicate predicate : ImGuiB3DClient.getMinecraftVersionPredicates()) {
+            if (!predicate.test(minecraftVersion))
+                return false;
+        }
+
+        return true;
     }
 
     public static ShaderManager getShaderManager() {
