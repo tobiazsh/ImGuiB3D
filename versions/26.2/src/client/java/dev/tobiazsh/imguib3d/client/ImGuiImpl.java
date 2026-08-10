@@ -31,8 +31,6 @@ import imgui.ImGuiIO;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
-import net.fabricmc.loader.api.Version;
-import net.fabricmc.loader.api.metadata.version.VersionPredicate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.PreferredGraphicsApi;
 import org.jspecify.annotations.NonNull;
@@ -184,14 +182,7 @@ public class ImGuiImpl extends ImGuiImplementation {
 
     @Override
     public boolean isCompatibleWithEnvironment() {
-        final Version minecraftVersion = ImGuiB3DClient.getMinecraftVersion();
-
-        for (VersionPredicate predicate : ImGuiB3DClient.getMinecraftVersionPredicates()) {
-            if (!predicate.test(minecraftVersion))
-                return false;
-        }
-
-        return true;
+        return ImGuiB3DClient.isMCVersionCompatible();
     }
 
     @Override
