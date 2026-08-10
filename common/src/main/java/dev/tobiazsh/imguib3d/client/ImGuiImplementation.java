@@ -36,6 +36,7 @@ public abstract class ImGuiImplementation {
     }
 
     public final @Nullable String id;
+    private static final int CONFIG_FLAGS = ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.ViewportsEnable;
 
     protected ImGuiImplementation(@Nullable String id) {
         this.id = id;
@@ -59,14 +60,23 @@ public abstract class ImGuiImplementation {
 
         final ImGuiIO io = ImGui.getIO();
         configureFonts(io);
+        configureFlags(io);
+        configureConfig(io);
+
         init(windowHandle);
     }
 
-    public void configureFonts(final ImGuiIO io) {
+    protected void configureFonts(final ImGuiIO io) {
         io.getFonts().addFontDefault();
         addFonts(io);
         io.getFonts().build();
-        io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
+    }
+
+    protected void configureFlags(final ImGuiIO io) {
+        io.setConfigFlags(CONFIG_FLAGS);
+    }
+
+    protected void configureConfig(final ImGuiIO io) {
         io.setIniFilename(id == null ? null : id + ".ini");
     }
 
