@@ -13,6 +13,11 @@ public interface ImGuiOverlay {
     void draw();
 
     /**
+     * Hook for disposing anything that should be disposed.
+     */
+    default void dispose() {}
+
+    /**
      * Renders the method if `isVisible` is `true`, otherwise not.
      */
     default void render() {
