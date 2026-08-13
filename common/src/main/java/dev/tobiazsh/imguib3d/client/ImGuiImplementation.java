@@ -3,6 +3,7 @@
 
 package dev.tobiazsh.imguib3d.client;
 
+import dev.tobiazsh.imguib3d.client.compatibility.CompatibilityChecker;
 import dev.tobiazsh.imguib3d.client.exception.NoImplementationException;
 import imgui.ImGui;
 import imgui.ImGuiIO;
@@ -13,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.Comparator;
 import java.util.ServiceLoader;
 
-public abstract class ImGuiImplementation {
+public abstract class ImGuiImplementation implements CompatibilityChecker {
 
     private static final @Nullable ImGuiImplementation INSTANCE =
             ServiceLoader.load(ImGuiImplementation.class)
@@ -85,6 +86,5 @@ public abstract class ImGuiImplementation {
         ImGui.destroyContext();
     }
 
-    public abstract boolean isCompatibleWithEnvironment();
     public abstract int priority();
 }
