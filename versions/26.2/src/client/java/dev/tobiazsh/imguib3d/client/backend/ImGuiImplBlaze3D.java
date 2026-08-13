@@ -313,8 +313,6 @@ public class ImGuiImplBlaze3D {
         commandEncoder.writeToBuffer(projectionMatrixUniform.slice(), projectionMatrixBuffer);
     }
 
-    // Is a parameter because it is already calculated in the uploadDrawData method,
-    // and we don't want to calculate it again
     /**
      * Uploads both the index and the vertex buffer to GPU.
      *
