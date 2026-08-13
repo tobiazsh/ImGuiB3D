@@ -1,3 +1,6 @@
+// Licensed under LGPL-3.0
+// Copyright © 2026 Tobiazsh
+
 package dev.tobiazsh.imguib3d.overlay;
 
 import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlay;
