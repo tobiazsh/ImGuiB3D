@@ -20,11 +20,11 @@
 
 layout(binding = 1) uniform sampler2D textureSampler;
 
-in vec2 uv;
-in vec4 inputColor;
+in vec2 fragUv;
+in vec4 fragColor;
 
 out vec4 outputColor;
 
 void main() {
-    outputColor = inputColor * texture(textureSampler, uv.st);
+    outputColor = fragColor * texture(textureSampler, fragUv.st);
 }
