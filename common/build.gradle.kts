@@ -7,6 +7,7 @@ repositories {
 }
 
 val imguiVersion = project.property("imgui_version").toString()
+val log4jVersion = project.property("log4j_version").toString()
 
 dependencies {
     api("io.github.spair:imgui-java-binding:$imguiVersion")
@@ -20,6 +21,11 @@ dependencies {
     compileOnlyApi("com.google.auto.service:auto-service-annotations:1.1.1")
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
     implementation("org.jspecify:jspecify:1.0.1")
-// Non MC deps
+
+    // Non MC deps
+
+    // Logging
+    implementation(platform("org.apache.logging.log4j:log4j-bom:${log4jVersion}"))
+    implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
 }
 
