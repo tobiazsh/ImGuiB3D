@@ -2,6 +2,9 @@
 
 package dev.tobiazsh.imguib3d.client.overlay;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.*;
 
 /**
@@ -12,6 +15,8 @@ import java.util.*;
  * then make a mixin into the game renderer and render every overlay inside the manager.
  */
 public final class ImGuiOverlayManager {
+
+    private static final Logger LOGGER = LogManager.getLogger("ImGuiB3D OverlayManager");
 
     public static final ImGuiOverlayManager INSTANCE = new ImGuiOverlayManager("ImGuiB3D Default");
 
