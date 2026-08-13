@@ -10,6 +10,8 @@ val loaderVersion = project.property("loader_version").toString()
 val fabricApiVersion = project.property("fabric_api_version").toString()
 val minecraftVersion = project.property("minecraft_version").toString()
 
+val testSrcSetName = "testmod"
+
 // Shared
 val modAuthor = rootProject.property("mod_author").toString()
 val modId = rootProject.property("mod_id").toString()
@@ -23,6 +25,31 @@ base {
 loom {
     splitEnvironmentSourceSets()
     accessWidenerPath = file("src/main/resources/imguib3d.classtweaker")
+
+    mods {
+        register(modId) {
+            sourceSet(sourceSets.getByName(testSrcSetName))
+        }
+    }
+
+    runs {
+        create(testSrcSetName) {
+            client()
+            displayName = "TestMod"
+            generateRunConfig = true
+            sourceSet.set("testmod")
+        }
+    }
+}
+
+sourceSets {
+    val testmod = create(testSrcSetName) {
+        compileClasspath += sourceSets.main.get().compileClasspath +
+                sourceSets.getByName("client").compileClasspath + sourceSets.getByName("client").output
+
+        runtimeClasspath += sourceSets.main.get().runtimeClasspath +
+                sourceSets.getByName("client").runtimeClasspath + sourceSets.getByName("client").output
+    }
 }
 
 repositories {
@@ -30,6 +57,9 @@ repositories {
 }
 
 dependencies {
+    "testmodImplementation"(sourceSets.getByName("client").output)
+    "testmodImplementation"(sourceSets.main.get().output)
+
     api(project(":common"))
     implementation(project(":common"))
     // To change the versions see the gradle.properties file

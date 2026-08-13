@@ -13,4 +13,3 @@ rootProject.name = "ImGuiB3D"
 
 include("common")
 include("versions:26.2")
-include("test")

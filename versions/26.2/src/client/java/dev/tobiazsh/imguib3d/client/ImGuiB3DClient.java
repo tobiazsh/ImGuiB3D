@@ -3,7 +3,6 @@
 
 package dev.tobiazsh.imguib3d.client;
 
-import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlayManager;
 import dev.tobiazsh.imguib3d.client.shader.ShaderManager;
 import dev.tobiazsh.imguib3d.client.shader.ShaderManagerImpl;
 import net.fabricmc.api.ClientModInitializer;

@@ -1,0 +1,12 @@
+package dev.tobiazsh.imguib3d;
+
+import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlayManager;
+import dev.tobiazsh.imguib3d.overlay.TestOverlay;
+import net.fabricmc.api.ClientModInitializer;
+
+public class TestModInitializer implements ClientModInitializer {
+    @Override
+    public void onInitializeClient() {
+        ImGuiOverlayManager.getInstance().add(new TestOverlay());
+    }
+}
