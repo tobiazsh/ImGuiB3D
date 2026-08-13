@@ -5,9 +5,10 @@ In this section, you will find detailed technical information about all the bell
 <hr/>
 
 ## Table of Contents:
-- [Architecture Overview](ARCHITECTURE.md)
 - [Installation](INSTALLATION.md)
 - [Basic Usage](BASIC_USAGE.md)
+- [Overlay Manager](OVERLAY_MANAGER.md)
+- [Texture Manager](TEXTURE_MANAGER.md)
 - [Shader Manager](SHADER_MANAGER.md)
 - [Font API](FONT_API.md)
 - [Backend](BACKEND.md)

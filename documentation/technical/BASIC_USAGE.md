@@ -1,3 +1,8 @@
+# Table of Contents
+* [Rendering ImGui inside a Minecraft Screen](#rendering-imgui-inside-a-minecraft-screen)
+* [Rendering ImGui directly in the window](#rendering-imgui-directly-in-the-window)
+* [Drawing Images](#drawing-images)
+
 # Basic Usage
 
 To get started with ImGui Blaze3D, you need to decide first how exactly you want to render your ImGui GUI. There
@@ -62,7 +67,7 @@ If you are finished with writing your overlay, you need to register it with the 
 This is done by calling the `add` method of the `ImGuiOverlayManager` singleton instance, passing in your overlay as
 the parameter. You can either pass a new instance of your screen, or you can pass an existing instance of your screen
 if you want easy access to your overlay in the future. More information about  the `ImGuiOverlayManager` can be found 
-in the [documentation of the `ImGuiOverlayManager` class](/documentation/technical/IMGUI_OVERLAY_MANAGER.md).
+in the [documentation of the `ImGuiOverlayManager` class](/documentation/technical/OVERLAY_MANAGER.md).
 
 ### Code Example
 
@@ -109,5 +114,46 @@ public class TestClient implements ClientModInitializer {
         ImGuiOverlayManager.getInstance().add(new ExampleOverlay());
     }
 
+}
+```
+
+## Drawing Images
+
+Drawing images in ImGui Blaze3D is a bit different than in regular ImGui, since ImGui Blaze3D (obviously) uses Blaze3D
+to render the ImGui GUI, meaning that you cannot use regular Gl functions and expect them to work. Instead, you should
+use `ImGuiTextureImpl` (version specific) to create your textures, and then use the `getTextureId()` method to retrieve
+the texture ID to pass into the `ImGui.image()` method. For a more convenient way of creating textures, you can use the
+`ImGuiTextureFactory` class (at least in 26.2) to create your textures. If the factory isn't available in your version,
+you can always create your texture through the constructor directly. Otherwise, ask for help in the discord server.
+
+When creating textures through the ImGuiB3D API, you do not have to manage the textures yourself. The API will
+automatically register them in the [TextureManager](TEXTURE_MANAGER.md), upload them to the GPU and bind them to the
+render pass. Furthermore, the API will also automatically free all textures when the game is closed, meaning you do not
+have to worry about memory leaks or other issues. If you desire to free a texture manually, you can of course do that by
+just calling `dispose()` on the texture object, which will mark it as unusable and free the memory on the next frame.
+The texture object will be automatically removed from the TextureManager.
+
+### Code Example
+
+```java
+public class ExampleOverlay implements ImGuiOverlay {
+    // ...
+  
+    private @Nullable ImGuiTexture flowerTexture;
+    
+    @Override
+    public void draw() {
+        if (flowerTexture != null && flowerTexture.isUsable())
+            ImGui.image(flowerTexture.getTextureId(), 100, 100);
+    }
+    
+    private void createTextures() {
+        flowerTexture = new ImGuiTextureImpl(
+                ExampleOverlay.class.getResourceAsStream("/assets/mymod/textures/flower.png"), // InputStream
+                "flower_image"                                                                 // Unique ID
+        );
+    }
+    
+    // ...
 }
 ```
