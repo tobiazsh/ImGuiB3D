@@ -56,7 +56,17 @@ public final class ImGuiOverlayManager {
      * @param overlay The new overlay to add.
      */
     public void add(final ImGuiOverlay overlay) {
-        overlays.put(overlay.getId(), overlay);
+        add(overlay.getId(), overlay);
+    }
+
+    public void add(final String id, final ImGuiOverlay overlay) {
+        if (overlays.containsKey(id)) {
+            LOGGER.warn("Tried to add overlay with id '{}' to overlay manager '{}', but an overlay with " +
+                    "that id already exists. Not adding overlay.", id, this.id);
+            return;
+        }
+
+        overlays.put(id, overlay);
     }
 
     /**
