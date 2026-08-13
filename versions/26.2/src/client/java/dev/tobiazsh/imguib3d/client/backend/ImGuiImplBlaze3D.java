@@ -44,6 +44,8 @@ import imgui.ImGui;
 import imgui.ImVec4;
 import imgui.type.ImInt;
 import net.minecraft.resources.Identifier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.ByteBuffer;
@@ -52,6 +54,7 @@ import java.util.OptionalDouble;
 
 public class ImGuiImplBlaze3D {
 
+    private static final Logger LOGGER = LogManager.getLogger("ImGuiB3D ImGuiImplBlaze3D");
     private static final Identifier SHADER_ID = Identifier.fromNamespaceAndPath(ImGuiB3D.MOD_ID, "core/imgui");
 
     private static final VertexFormat IMGUI_VERTEX_FORMAT = VertexFormat.builder(0)
@@ -120,7 +123,7 @@ public class ImGuiImplBlaze3D {
         );
 
         if (!compiledRenderPipeline.isValid())
-            ImGuiB3DClient.LOGGER.error("Failed to recompile ImGui render pipeline!");
+            LOGGER.error("Failed to recompile ImGui render pipeline!");
 
         if (projectionMatrixUniform != null)
             projectionMatrixUniform.close();
@@ -140,7 +143,7 @@ public class ImGuiImplBlaze3D {
         if (renderPipeline == null) {
             createRenderPipeline();
         } else if (compiledRenderPipeline != null && !compiledRenderPipeline.isValid()) {
-            ImGuiB3DClient.LOGGER.warn("ImGui pipeline is invalid! Clearing cache and recreating pipeline...");
+            LOGGER.warn("ImGui pipeline is invalid! Clearing cache and recreating pipeline...");
             RenderSystem.getDevice().clearPipelineCache();
             createRenderPipeline();
         }
