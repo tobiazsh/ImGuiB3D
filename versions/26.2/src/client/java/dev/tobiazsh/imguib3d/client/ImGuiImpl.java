@@ -51,6 +51,7 @@ public class ImGuiImpl extends ImGuiImplementation {
     public @Nullable ImGuiImplGl3 imGuiImplGl3;
     public @Nullable ImGuiImplBlaze3D imGuiImplBlaze3D;
 
+    // Used by AutoService!
     public ImGuiImpl() {
         this(null);
     }
