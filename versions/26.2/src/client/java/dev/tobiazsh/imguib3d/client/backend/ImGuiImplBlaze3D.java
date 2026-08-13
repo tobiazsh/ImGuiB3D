@@ -38,6 +38,8 @@ import dev.tobiazsh.imguib3d.client.ImGuiB3DClient;
 import dev.tobiazsh.imguib3d.client.map.ShaderIdentifierMapperImpl;
 import dev.tobiazsh.imguib3d.client.map.ShaderTypeMapperImpl;
 import dev.tobiazsh.imguib3d.client.shader.ShaderKey;
+import dev.tobiazsh.imguib3d.client.texture.ImGuiTextureImpl;
+import dev.tobiazsh.imguib3d.client.texture.TextureManager;
 import imgui.ImDrawData;
 import imgui.ImFontAtlas;
 import imgui.ImGui;
@@ -63,10 +65,6 @@ public class ImGuiImplBlaze3D {
             .addAttribute("color", GpuFormat.RGBA8_UNORM)
             .build();
 
-    private @Nullable GpuTexture fontTexture;
-    private @Nullable GpuTextureView fontTextureView;
-    private @Nullable GpuSampler fontTextureSampler;
-
     private @Nullable RenderPipeline renderPipeline;
     private @Nullable CompiledRenderPipeline compiledRenderPipeline;
 
@@ -78,6 +76,8 @@ public class ImGuiImplBlaze3D {
 
     private @Nullable GpuBuffer indexBuffer;
     private @Nullable GpuBuffer vertexBuffer;
+
+    private @Nullable ImGuiTextureImpl fontAtlasTexture;
 
     private final ImVec4 clipRect = new ImVec4();
 
@@ -148,7 +148,7 @@ public class ImGuiImplBlaze3D {
             createRenderPipeline();
         }
 
-        if (fontTexture == null)
+        if (fontAtlasTexture == null)
             createFontTextures();
     }
 
@@ -159,6 +159,21 @@ public class ImGuiImplBlaze3D {
      * @param renderPass The render pass to use.
      */
     public void renderDrawData(final ImDrawData drawData, final RenderPass renderPass) {
+        if (renderPipeline == null) {
+            LOGGER.error("ImGui render pipeline is invalid!");
+            return;
+        }
+
+        if (projectionMatrixUniform == null) {
+            LOGGER.error("ImGui projection matrix uniform is invalid!");
+            return;
+        }
+
+        if (fontAtlasTexture == null) {
+            LOGGER.error("ImGui font atlas texture is invalid!");
+            return;
+        }
+
         final Framebuffer framebuffer = Framebuffer.fromDrawData(drawData);
         final int commandListsCount = drawData.getCmdListsCount();
 
@@ -167,7 +182,6 @@ public class ImGuiImplBlaze3D {
 
         renderPass.setPipeline(renderPipeline);
         renderPass.setUniform("projectionMatrix", projectionMatrixUniform);
-        renderPass.bindTexture("textureSampler", fontTextureView, fontTextureSampler);
 
         final float clipOffX = drawData.getDisplayPosX();
         final float clipOffY = drawData.getDisplayPosY();
@@ -191,6 +205,16 @@ public class ImGuiImplBlaze3D {
 
             for (int j = 0; j < drawData.getCmdListCmdBufferSize(i); j++) {
                 drawData.getCmdListCmdBufferClipRect(clipRect, i, j);
+
+                final long textureId = drawData.getCmdListCmdBufferTextureId(i, j);
+                final ImGuiTextureImpl texture = (ImGuiTextureImpl) TextureManager.getInstance().getTexture(textureId);
+
+                if (texture != null) {
+                    texture.bind("textureSampler", renderPass);
+                } else {
+                    // If texture is null, fall back to font atlas so it doesn't render invisible/garbage
+                    fontAtlasTexture.bind("textureSampler", renderPass);
+                }
 
                 final float clipMinX = (clipRect.x - clipOffX) * clipScaleX;
                 final float clipMinY = (clipRect.y - clipOffY) * clipScaleY;
@@ -395,9 +419,10 @@ public class ImGuiImplBlaze3D {
         final ImInt textureWidth = new ImInt();
         final ImInt textureHeight = new ImInt();
 
-        ByteBuffer fontTexturePixels = fontAtlas.getTexDataAsRGBA32(textureWidth, textureHeight);
+        // Owned by ImFontAtlas, do not free
+        final ByteBuffer fontTexturePixels = fontAtlas.getTexDataAsRGBA32(textureWidth, textureHeight);
 
-        fontTexture = gpuDevice.createTexture(
+        final GpuTexture fontTexture = gpuDevice.createTexture(
                 "ImGui Font Textures",
                 GpuTexture.USAGE_TEXTURE_BINDING | GpuTexture.USAGE_COPY_DST,
                 GpuFormat.RGBA8_UNORM,
@@ -414,18 +439,29 @@ public class ImGuiImplBlaze3D {
                 textureHeight.get()
         );
 
-        fontTextureView = gpuDevice.createTextureView(fontTexture);
+        final GpuTextureView fontTextureView = gpuDevice.createTextureView(fontTexture);
 
-        fontTextureSampler = gpuDevice.createSampler(
+        final GpuSampler fontTextureSampler = gpuDevice.createSampler(
                 AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE,
                 FilterMode.LINEAR, FilterMode.LINEAR,
                 1,
                 OptionalDouble.empty()
         );
 
-        // Upload and mark as available
+        fontAtlasTexture = new ImGuiTextureImpl(
+                fontTexture,
+                fontTextureView,
+                fontTextureSampler,
+                fontTexturePixels,
+                textureWidth.get(),
+                textureHeight.get(),
+                "ImGui Font Atlas"
+        );
+
+        fontAtlasTexture.upload(commandEncoder);
         commandEncoder.submit();
-        fontAtlas.setTexID(1);
+
+        fontAtlas.setTexID(fontAtlasTexture.getTextureId());
     }
 
     /**
@@ -434,20 +470,12 @@ public class ImGuiImplBlaze3D {
      * such as when the application is shutting down or when the font textures need to be recreated.
      */
     private void disposeFontTextures() {
-        if (fontTextureSampler != null) {
-            fontTextureSampler.close();
-            fontTextureSampler = null;
+        if (fontAtlasTexture != null) {
+            fontAtlasTexture.dispose();
+            fontAtlasTexture = null;
         }
 
-        if (fontTextureView != null) {
-            fontTextureView.close();
-            fontTextureView = null;
-        }
-
-        if (fontTexture != null) {
-            fontTexture.close();
-            fontTexture = null;
-        }
+        TextureManager.getInstance().clean();
     }
 
     public void dispose() {
