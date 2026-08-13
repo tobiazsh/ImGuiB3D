@@ -25,6 +25,8 @@ import com.mojang.blaze3d.systems.*;
 import dev.tobiazsh.imguib3d.client.backend.ImGuiImplBlaze3D;
 import dev.tobiazsh.imguib3d.client.access.GlDeviceAccessor;
 import dev.tobiazsh.imguib3d.client.access.GpuDeviceAccessor;
+import dev.tobiazsh.imguib3d.client.texture.ImGuiTexture;
+import dev.tobiazsh.imguib3d.client.texture.TextureManager;
 import imgui.ImDrawData;
 import imgui.ImGui;
 import imgui.ImGuiIO;
@@ -82,6 +84,11 @@ public class ImGuiImpl extends ImGuiImplementation {
     public void draw(ImGuiDrawable imGuiDrawable) {
         final RenderTarget renderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
         final GpuDevice gpuDevice = RenderSystem.getDevice();
+
+        TextureManager.getInstance().clean();
+
+        for (ImGuiTexture queued : TextureManager.getInstance().getQueuedTextures())
+            queued.upload();
 
         if (imGuiImplBlaze3D != null)
             drawBlaze3D(gpuDevice, renderTarget, imGuiDrawable);
