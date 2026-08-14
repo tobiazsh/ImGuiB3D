@@ -139,7 +139,7 @@ public class ImGuiImplBlaze3D {
      * Checks if the render pipeline is valid and creates it if necessary.
      * Also ensures that the font textures are created and available for rendering.
      */
-    public void newFrame() {
+    public void newFrame(boolean clearFontTextures) {
         if (renderPipeline == null) {
             createRenderPipeline();
         } else if (compiledRenderPipeline != null && !compiledRenderPipeline.isValid()) {
@@ -147,6 +147,9 @@ public class ImGuiImplBlaze3D {
             RenderSystem.getDevice().clearPipelineCache();
             createRenderPipeline();
         }
+
+        if (clearFontTextures)
+            disposeFontTextures();
 
         if (fontAtlasTexture == null)
             createFontTextures();

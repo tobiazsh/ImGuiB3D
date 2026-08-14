@@ -5,6 +5,7 @@ package dev.tobiazsh.imguib3d.client;
 
 import dev.tobiazsh.imguib3d.client.compatibility.CompatibilityChecker;
 import dev.tobiazsh.imguib3d.client.exception.NoImplementationException;
+import dev.tobiazsh.imguib3d.client.font.FontManager;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.extension.implot.ImPlot;
@@ -55,6 +56,7 @@ public abstract class ImGuiImplementation implements CompatibilityChecker {
         ImPlot.createContext();
 
         final ImGuiIO io = ImGui.getIO();
+
         configureFonts(io);
         configureFlags(io);
         configureConfig(io);
@@ -63,9 +65,34 @@ public abstract class ImGuiImplementation implements CompatibilityChecker {
     }
 
     protected void configureFonts(final ImGuiIO io) {
-        io.getFonts().addFontDefault();
         addFonts(io);
+        buildFontsAtlas(io);
+    }
+
+    protected void addFonts(final ImGuiIO io) {
+        io.getFonts().addFontDefault();
+        FontManager.getInstance().reregisterAllLoaded(io.getFonts()); // Reregister old fonts
+        FontManager.getInstance().registerAllQueued(io.getFonts());   // Add new fonts
+    }
+
+    protected void buildFontsAtlas(final ImGuiIO io) {
         io.getFonts().build();
+    }
+
+    protected void rebuildFontsAtlas(final ImGuiIO io) {
+        io.getFonts().clear();
+        FontManager.getInstance().unloadAll();
+        addFonts(io);
+        buildFontsAtlas(io);
+    }
+
+    protected boolean rebuildFontAtlasIfNeeded(final ImGuiIO io) {
+        final boolean hasQueuedFonts = FontManager.getInstance().hasQueuedFonts();
+
+        if (hasQueuedFonts)
+            rebuildFontsAtlas(io);
+
+        return hasQueuedFonts;
     }
 
     protected void configureFlags(final ImGuiIO io) {

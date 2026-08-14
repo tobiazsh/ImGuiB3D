@@ -25,11 +25,11 @@ import com.mojang.blaze3d.systems.*;
 import dev.tobiazsh.imguib3d.client.backend.ImGuiImplBlaze3D;
 import dev.tobiazsh.imguib3d.client.access.GlDeviceAccessor;
 import dev.tobiazsh.imguib3d.client.access.GpuDeviceAccessor;
+import dev.tobiazsh.imguib3d.client.font.FontManager;
 import dev.tobiazsh.imguib3d.client.texture.ImGuiTexture;
 import dev.tobiazsh.imguib3d.client.texture.TextureManager;
 import imgui.ImDrawData;
 import imgui.ImGui;
-import imgui.ImGuiIO;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
@@ -122,8 +122,14 @@ public class ImGuiImpl extends ImGuiImplementation {
         GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, frameBufferCache.getFbo(directStateAccess, attachmentList, null));
         GL11C.glViewport(0, 0, renderTarget.width, renderTarget.height);
 
+        final boolean rebuilt = rebuildFontAtlasIfNeeded(ImGui.getIO());
+
+        if (rebuilt)
+            imGuiImplGl3.destroyFontsTexture();
+
         imGuiImplGl3.newFrame();
         imGuiImplGlfw.newFrame();
+
         ImGui.newFrame();
 
         imGuiDrawable.draw(ImGui.getIO());
@@ -142,7 +148,10 @@ public class ImGuiImpl extends ImGuiImplementation {
         if (imGuiImplBlaze3D == null)
             return; // Just for safety in case the method is being called somewhere where it shouldn't be
 
-        imGuiImplBlaze3D.newFrame();
+        FontManager.getInstance().disposeMarkedIfNeeded();
+        final boolean rebuilt = rebuildFontAtlasIfNeeded(ImGui.getIO());
+
+        imGuiImplBlaze3D.newFrame(rebuilt);
         imGuiImplGlfw.newFrame();
         ImGui.newFrame();
 
