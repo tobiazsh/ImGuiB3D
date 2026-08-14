@@ -46,13 +46,8 @@ public abstract class ImGuiImplementation implements CompatibilityChecker {
         this(null);
     }
 
-    public abstract void onFontAtlasBuild();
-    public abstract void onFontAtlasDispose();
-    public abstract void onFontAtlasRebuild();
-
     public abstract void draw(ImGuiDrawable imGuiDrawable);
 
-    protected abstract void addFonts(final ImGuiIO io);
     protected abstract void init(final long windowHandle);
 
     public void initialize(final long windowHandle) {

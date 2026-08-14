@@ -169,26 +169,6 @@ public class ImGuiImpl extends ImGuiImplementation {
     }
 
     @Override
-    public void onFontAtlasBuild() {
-
-    }
-
-    @Override
-    public void onFontAtlasDispose() {
-
-    }
-
-    @Override
-    public void onFontAtlasRebuild() {
-
-    }
-
-    @Override
-    protected void addFonts(ImGuiIO io) {
-
-    }
-
-    @Override
     public boolean isCompatibleWithEnvironment() {
         return ImGuiB3DClient.isMCVersionCompatible();
     }
