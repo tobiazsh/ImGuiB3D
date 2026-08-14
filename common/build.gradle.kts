@@ -27,5 +27,8 @@ dependencies {
     // Logging
     implementation(platform("org.apache.logging.log4j:log4j-bom:${log4jVersion}"))
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
+
+    // Misc
+    implementation("com.google.guava:guava:33.6.0-jre")
 }
 
