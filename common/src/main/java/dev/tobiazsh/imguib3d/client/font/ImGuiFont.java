@@ -44,14 +44,20 @@ public final class ImGuiFont {
      *         {@link #loadFromStreamTTF(InputStream, FontIdentifier, int, FontImportance)} instead
      *
      * @param path The path to the file to read the font data from.
+     * @param identifier The identifier of the font to load. This is used to identify the font in the FontManager later.
      * @param size The size of the font to load.
      * @param importance The importance of the font for registration budget purposes.
      *                   See {@link FontImportance} for more details.
      * @return A CompletableFuture that will complete as soon as the font is loaded and registered in the FontManager,
      *         meaning it could be ready right away if the font has existed in the FontManager beforehand.
      */
-    public static ImGuiFontFuture loadFromFileTTF(final Path path, final int size, final FontImportance importance) {
-        final ImGuiFontKey key = new ImGuiFontKey(path.toString(), size);
+    public static ImGuiFontFuture loadFromFileTTF(
+            final Path path,
+            final FontIdentifier identifier,
+            final int size,
+            final FontImportance importance
+    ) {
+        final ImGuiFontKey key = new ImGuiFontKey(identifier, size);
 
         // Check if font is already registered in the FontManager
         final Optional<ImGuiFont> loadedFont = FontManager.getInstance().getFont(key);
@@ -79,18 +85,19 @@ public final class ImGuiFont {
      * Load a font from a file in TTF format. The font will be loaded asynchronously and registered in the
      * FontManager. If a font with the same name and size is already present in the FontManager, the existing font will
      * be returned. Defaults to {@link FontImportance#MEDIUM} for registration budget. To specify a different
-     * importance, use {@link #loadFromFileTTF(Path, int, FontImportance)} instead.
+     * importance, use {@link #loadFromFileTTF(Path, FontIdentifier, int, FontImportance)} instead.
      *
      * @apiNote If you want to load a font from an InputStream (e.g. resources), you may be interested in
      *         {@link #loadFromStreamTTF(InputStream, FontIdentifier, int, FontImportance)} instead
      *
      * @param path The path to the file to read the font data from.
+     * @param identifier The identifier of the font to load. This is used to identify the font in the FontManager later.
      * @param size The size of the font to load.
      * @return A CompletableFuture that will complete as soon as the font is loaded and registered in the FontManager,
      *         meaning it could be ready right away if the font has existed in the FontManager beforehand.
      */
-    public static ImGuiFontFuture loadFromFileTTF(final Path path, final int size) {
-        return loadFromFileTTF(path, size, FontImportance.MEDIUM);
+    public static ImGuiFontFuture loadFromFileTTF(final Path path, final FontIdentifier identifier, final int size) {
+        return loadFromFileTTF(path, identifier, size, FontImportance.MEDIUM);
     }
 
     /**
@@ -99,7 +106,7 @@ public final class ImGuiFont {
      * If a font with the same name and size is already present in the FontManager, the existing font will be returned.
      *
      * @apiNote If you want to load a font from a file outside of resources, you may be interested in
-     *          {@link #loadFromFileTTF(Path, int, FontImportance)} instead.
+     *          {@link #loadFromFileTTF(Path, FontIdentifier, int, FontImportance)} instead.
      *
      * @param stream The InputStream to read the font data from. The stream will be closed after reading.
      * @param identifier The identifier of the font to load. This is used to identify the font in the FontManager later.
@@ -148,7 +155,7 @@ public final class ImGuiFont {
      * importance, use {@link #loadFromStreamTTF(InputStream, FontIdentifier, int, FontImportance)} instead.
      *
      * @apiNote If you want to load a font from a file outside of resources, you may be interested in
-     *          {@link #loadFromFileTTF(Path, int, FontImportance)} instead.
+     *          {@link #loadFromFileTTF(Path, FontIdentifier, int, FontImportance)} instead.
      *
      * @param stream The InputStream to read the font data from. The stream will be closed after reading.
      * @param identifier The identifier of the font to load. This is used to identify the font in the FontManager later.
