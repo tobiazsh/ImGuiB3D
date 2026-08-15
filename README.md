@@ -34,6 +34,8 @@ using this library within your own project.
 ## Demonstration
 <img src="/res/imgui_demo.png" alt="ImGui Demo window inside a Minecraft 26.2 window">
 
+## [Developer Installation](documentation/technical/INSTALLATION.md)
+
 ## Adding support for new versions
 To add support to new Minecraft versions, you first must create a new module in the `versions` directory,
 specify the new module in the root `settings.gradle` and add the `:common` module as a dependency to the
