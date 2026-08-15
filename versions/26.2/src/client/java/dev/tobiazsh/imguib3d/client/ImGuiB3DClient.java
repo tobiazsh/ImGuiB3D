@@ -3,9 +3,11 @@
 
 package dev.tobiazsh.imguib3d.client;
 
+import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlayManager;
 import dev.tobiazsh.imguib3d.client.shader.ShaderManager;
 import dev.tobiazsh.imguib3d.client.shader.ShaderManagerImpl;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
@@ -28,6 +30,11 @@ public class ImGuiB3DClient implements ClientModInitializer {
     public void onInitializeClient() {
         LOGGER.info("Using ImGuiB3D version: {}", VERSION);
         LOGGER.info("Registering ImGui Overlays...");
+
+        ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> {
+            LOGGER.info("Disposing ImGuiB3D resources...");
+            ImGuiOverlayManager.getInstance().disposeAll();
+        });
     }
 
     private static String getVersion() {

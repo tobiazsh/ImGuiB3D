@@ -84,6 +84,7 @@ public final class ImGuiOverlayManager {
      * @param overlay The overlay to remove.
      */
     public void remove(final ImGuiOverlay overlay) {
+        overlay.dispose();
         remove(overlay.getId());
     }
 
@@ -92,7 +93,16 @@ public final class ImGuiOverlayManager {
      * @param id The id of the overlay to remove.
      */
     public void remove(final String id) {
+        find(id).ifPresent(ImGuiOverlay::dispose);
         overlays.remove(id);
+    }
+
+    /**
+     * Disposes all overlays in the manager and clears the map.
+     */
+    public void disposeAll() {
+        overlays.values().forEach(ImGuiOverlay::dispose);
+        overlays.clear();
     }
 
     /**
