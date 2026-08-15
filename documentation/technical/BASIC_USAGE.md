@@ -59,6 +59,12 @@ that the interface has a few methods that you _must_ implement:
 - `int priority()`: This is the priority of the overlay, meaning that overlays with a higher priority will be drawn
   on top of overlays with a lower priority. In everyday use, this may not matter since the ImGui windows can be called
   into focus anyway, but it may still be useful to have a priority system in place for certain use cases.
+- `void dispose()`: This can be used to free any resources that the overlay may have allocated. This is called when the
+  overlay is removed from the `ImGuiOverlayManager`, or when the game is closed.
+- `void createTextures()`: This can be used to create any textures that the overlay may need. This is called before each
+  `render()`
+- `void createFonts()`: This can be used to create any fonts that the overlay may need.
+  This is called before each `render()`
 - `String getId()`: This is the unique identifier of the overlay, meaning that you cannot have two overlays with the same
   ID. The ID is used to identify the overlay in the manager, and it is also used to save the state of the overlay
   between sessions.
@@ -147,11 +153,14 @@ public class ExampleOverlay implements ImGuiOverlay {
             ImGui.image(flowerTexture.getTextureId(), 100, 100);
     }
     
-    private void createTextures() {
-        flowerTexture = new ImGuiTextureImpl(
-                ExampleOverlay.class.getResourceAsStream("/assets/mymod/textures/flower.png"), // InputStream
-                "flower_image"                                                                 // Unique ID
-        );
+    @Override
+    public void createTextures() {
+        if (flowerTexture == null || flowerTexture.isDisposed()) {
+            flowerTexture = new ImGuiTextureImpl(
+                    ExampleOverlay.class.getResourceAsStream("/assets/mymod/textures/flower.png"), // InputStream
+                    "flower_image"                                                                 // Unique ID
+            );
+        }
     }
     
     // ...
