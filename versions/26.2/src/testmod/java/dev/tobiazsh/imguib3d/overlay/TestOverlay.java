@@ -12,9 +12,12 @@ import dev.tobiazsh.imguib3d.client.texture.ImGuiTexture;
 import dev.tobiazsh.imguib3d.client.texture.ImGuiTextureImpl;
 import imgui.ImGui;
 import org.jspecify.annotations.Nullable;
+import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 public class TestOverlay implements ImGuiOverlay {
 
@@ -25,6 +28,8 @@ public class TestOverlay implements ImGuiOverlay {
     private @Nullable ImGuiTexture flowerTexture;
     private @Nullable ImGuiFont robotoSlab;
     private @Nullable ImGuiFont sekuya;
+
+    private @Nullable ByteBuffer testBuffer;
 
     @Override
     public boolean isVisible() {
@@ -77,6 +82,10 @@ public class TestOverlay implements ImGuiOverlay {
                 throw new RuntimeException("Failed to load flower texture", e);
             }
         }
+
+        testBuffer = MemoryUtil.memAlloc(1024 * 1024); // Allocate 1MB of memory for testing
+        testBuffer.put("Hello, this is a test".getBytes(StandardCharsets.UTF_8));
+        testBuffer.flip();
     }
 
     @Override
@@ -113,6 +122,15 @@ public class TestOverlay implements ImGuiOverlay {
             } catch (IOException e) {
                 throw new RuntimeException("Failed to load Sekuya font", e);
             }
+        }
+    }
+
+    @Override
+    public void dispose() {
+        if (testBuffer != null) {
+            MemoryUtil.memFree(testBuffer);
+            TestModInitializer.LOGGER.info("TestOverlay disposed!");
+            testBuffer = null;
         }
     }
 
