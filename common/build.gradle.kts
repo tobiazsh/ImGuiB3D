@@ -6,6 +6,9 @@ repositories {
     mavenCentral()
 }
 
+group = rootProject.property("maven_group").toString()
+version = rootProject.property("mod_version").toString()
+
 val imguiVersion = project.property("imgui_version").toString()
 val log4jVersion = project.property("log4j_version").toString()
 
@@ -32,3 +35,8 @@ dependencies {
     implementation("com.google.guava:guava:33.6.0-jre")
 }
 
+tasks.withType<Javadoc>().configureEach {
+    (options as StandardJavadocDocletOptions).apply {
+        addStringOption("Xdoclint:all,-missing", "-quiet")
+    }
+}

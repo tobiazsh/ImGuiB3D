@@ -18,6 +18,9 @@ val modId = rootProject.property("mod_id").toString()
 val modName = rootProject.property("mod_name").toString()
 val modVersion = rootProject.property("mod_version").toString()
 
+version = modVersion
+group = rootProject.property("maven_group").toString()
+
 base {
     archivesName = project.property("archives_base_name").toString()
 }
@@ -112,6 +115,7 @@ tasks.jar {
     from("LICENSE") {
         rename { fileName -> "${fileName}_${project.property("archives_base_name")}" }
     }
+    archiveBaseName.set("${modId}-${modVersion}_${minecraftVersion}")
 }
 
 //// configure the maven publication
