@@ -28,7 +28,7 @@ public final class ImGuiFont {
         DEFAULT_FONT_CONFIG.setFontDataOwnedByAtlas(false);
     }
 
-    public ImGuiFont(final ImFont imFont, final ImGuiFontKey fontKey, final byte[] fontData) {
+    ImGuiFont(final ImFont imFont, final ImGuiFontKey fontKey, final byte[] fontData) {
         this.imFont = imFont;
         this.fontKey = fontKey;
         this.fontData = fontData;
