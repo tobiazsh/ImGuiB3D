@@ -3,5 +3,5 @@
 
 package dev.tobiazsh.imguib3d.client.font;
 
-public record ImGuiFontKey(String fontName, int fontSize) {
+public record ImGuiFontKey(FontIdentifier identifier, int fontSize) {
 }

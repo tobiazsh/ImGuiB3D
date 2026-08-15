@@ -41,7 +41,7 @@ public final class ImGuiFont {
      * be returned.
      *
      * @apiNote If you want to load a font from an InputStream (e.g. resources), you may be interested in
-     *         {@link #loadFromStreamTTF(InputStream, String, int, FontImportance)} instead
+     *         {@link #loadFromStreamTTF(InputStream, FontIdentifier, int, FontImportance)} instead
      *
      * @param path The path to the file to read the font data from.
      * @param size The size of the font to load.
@@ -82,7 +82,7 @@ public final class ImGuiFont {
      * importance, use {@link #loadFromFileTTF(Path, int, FontImportance)} instead.
      *
      * @apiNote If you want to load a font from an InputStream (e.g. resources), you may be interested in
-     *         {@link #loadFromStreamTTF(InputStream, String, int, FontImportance)} instead
+     *         {@link #loadFromStreamTTF(InputStream, FontIdentifier, int, FontImportance)} instead
      *
      * @param path The path to the file to read the font data from.
      * @param size The size of the font to load.
@@ -102,20 +102,20 @@ public final class ImGuiFont {
      *          {@link #loadFromFileTTF(Path, int, FontImportance)} instead.
      *
      * @param stream The InputStream to read the font data from. The stream will be closed after reading.
-     * @param name The name of the font to load. This is used as the key together with the size in the FontManager.
+     * @param identifier The identifier of the font to load. This is used to identify the font in the FontManager later.
+     * @param size The size of the font to load.
      * @param importance The importance of the font for registration budget purposes.
      *                   See {@link FontImportance} for more details.
-     * @param size The size of the font to load.
      * @return A CompletableFuture that will complete as soon as the font is loaded and registered in the FontManager,
      *         meaning it could be ready right away if the font has existed in the FontManager beforehand.
      */
     public static ImGuiFontFuture loadFromStreamTTF(
             final InputStream stream,
-            final String name,
+            final FontIdentifier identifier,
             final int size,
             final FontImportance importance
     ) {
-        final ImGuiFontKey key = new ImGuiFontKey(name, size);
+        final ImGuiFontKey key = new ImGuiFontKey(identifier, size);
 
         // Check if font is already registered in the FontManager
         final Optional<ImGuiFont> loadedFont = FontManager.getInstance().getFont(key);
@@ -145,23 +145,23 @@ public final class ImGuiFont {
      * FontManager. May be used to load fonts from resources or other sources where a file path is not available.
      * If a font with the same name and size is already present in the FontManager, the existing font will be returned.
      * Defaults to {@link FontImportance#MEDIUM} for registration budget. To specify a different
-     * importance, use {@link #loadFromStreamTTF(InputStream, String, int, FontImportance)} instead.
+     * importance, use {@link #loadFromStreamTTF(InputStream, FontIdentifier, int, FontImportance)} instead.
      *
      * @apiNote If you want to load a font from a file outside of resources, you may be interested in
      *          {@link #loadFromFileTTF(Path, int, FontImportance)} instead.
      *
      * @param stream The InputStream to read the font data from. The stream will be closed after reading.
-     * @param name The name of the font to load. This is used as the key together with the size in the FontManager.
+     * @param identifier The identifier of the font to load. This is used to identify the font in the FontManager later.
      * @param size The size of the font to load.
      * @return A CompletableFuture that will complete as soon as the font is loaded and registered in the FontManager,
      *         meaning it could be ready right away if the font has existed in the FontManager beforehand.
      */
     public static ImGuiFontFuture loadFromStreamTTF(
             final InputStream stream,
-            final String name,
+            final FontIdentifier identifier,
             final int size
     ) {
-        return loadFromStreamTTF(stream, name, size, FontImportance.MEDIUM);
+        return loadFromStreamTTF(stream, identifier, size, FontImportance.MEDIUM);
     }
 
     void setLoaded(boolean loaded) {
