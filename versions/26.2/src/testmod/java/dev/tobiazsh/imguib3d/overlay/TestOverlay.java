@@ -3,6 +3,8 @@
 
 package dev.tobiazsh.imguib3d.overlay;
 
+import dev.tobiazsh.imguib3d.TestModInitializer;
+import dev.tobiazsh.imguib3d.client.font.FontIdentifier;
 import dev.tobiazsh.imguib3d.client.font.FontManager;
 import dev.tobiazsh.imguib3d.client.font.ImGuiFont;
 import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlay;
@@ -82,7 +84,11 @@ public class TestOverlay implements ImGuiOverlay {
                 if (is == null)
                     throw new RuntimeException("Failed to load Roboto Slab font: resource not found");
 
-                ImGuiFont.loadFromStreamTTF(is, "Roboto Slab", ImGui.getFontSize() * 2).thenAccept(
+                ImGuiFont.loadFromStreamTTF(
+                        is,
+                        FontIdentifier.of(TestModInitializer.getModId(), "Roboto Slab"),
+                        ImGui.getFontSize() * 2
+                ).thenAccept(
                         font -> robotoSlab = font
                 );
             } catch (IOException e) {
@@ -95,11 +101,15 @@ public class TestOverlay implements ImGuiOverlay {
                 if (is == null)
                     throw new RuntimeException("Failed to load Sekuya Slab font: resource not found");
 
-                ImGuiFont.loadFromStreamTTF(is, "Sekuya", ImGui.getFontSize() * 2).thenAccept(
+                ImGuiFont.loadFromStreamTTF(
+                        is,
+                        FontIdentifier.of(TestModInitializer.getModId(), "Sekuya"),
+                        ImGui.getFontSize() * 2
+                ).thenAccept(
                         font -> sekuya = font
                 );
             } catch (IOException e) {
-                throw new RuntimeException("Failed to load Roboto Slab font", e);
+                throw new RuntimeException("Failed to load Sekuya font", e);
             }
         }
     }
