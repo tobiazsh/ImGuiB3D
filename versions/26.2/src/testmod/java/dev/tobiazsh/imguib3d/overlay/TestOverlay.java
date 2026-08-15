@@ -65,7 +65,8 @@ public class TestOverlay implements ImGuiOverlay {
         }
     }
 
-    private void createTextures() {
+    @Override
+    public void createTextures() {
         if (flowerTexture == null) {
             try (InputStream is = TestOverlay.class.getResourceAsStream("/assets/testmod/textures/flower.png")) {
                 if (is == null)
@@ -78,7 +79,8 @@ public class TestOverlay implements ImGuiOverlay {
         }
     }
 
-    private void createFonts() {
+    @Override
+    public void createFonts() {
         if (robotoSlab == null) {
             try (InputStream is = TestOverlay.class.getResourceAsStream("/assets/testmod/fonts/RobotoSlab-Regular.ttf")) {
                 if (is == null)

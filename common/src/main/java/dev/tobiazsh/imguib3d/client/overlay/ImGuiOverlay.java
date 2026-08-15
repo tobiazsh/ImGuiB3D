@@ -16,6 +16,16 @@ public interface ImGuiOverlay {
     void draw();
 
     /**
+     * Hook for creating any textures that should be created.
+     */
+    default void createTextures() {}
+
+    /**
+     * Hook for creating any fonts that should be created.
+     */
+    default void createFonts() {}
+
+    /**
      * Hook for disposing anything that should be disposed.
      */
     default void dispose() {}
@@ -24,8 +34,11 @@ public interface ImGuiOverlay {
      * Renders the method if `isVisible` is `true`, otherwise not.
      */
     default void render() {
-        if (isVisible())
+        if (isVisible()) {
+            createTextures();
+            createFonts();
             draw();
+        }
     }
 
     int priority();
