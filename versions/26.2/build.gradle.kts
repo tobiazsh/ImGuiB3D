@@ -115,7 +115,10 @@ tasks.jar {
     from("LICENSE") {
         rename { fileName -> "${fileName}_${project.property("archives_base_name")}" }
     }
-    archiveBaseName.set("${modId}-${modVersion}_${minecraftVersion}")
+}
+
+tasks.withType<Jar>().configureEach {
+    archiveVersion.set("$modVersion+$minecraftVersion")
 }
 
 //// configure the maven publication
