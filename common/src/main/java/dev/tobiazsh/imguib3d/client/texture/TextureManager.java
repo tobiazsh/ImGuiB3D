@@ -28,7 +28,7 @@ public final class TextureManager {
      * Registers a texture in the Map of USABLE textures. Do not register unuploaded or disposed textures.
      * Any match in the queued textures will be removed from the queue and added to the usable textures.
      *
-     * @apiNote Only register textures that are not disposed.
+     * <p><b>API Note:</b> Only register textures that are not disposed.
      *          Disposed textures will be automatically removed from the manager.
      *
      * @param texture The texture to register.

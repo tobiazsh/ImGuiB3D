@@ -40,7 +40,7 @@ public final class ImGuiFont {
      * FontManager. If a font with the same name and size is already present in the FontManager, the existing font will
      * be returned.
      *
-     * @apiNote If you want to load a font from an InputStream (e.g. resources), you may be interested in
+     * <p><b>API Note:</b> If you want to load a font from an InputStream (e.g. resources), you may be interested in
      *         {@link #loadFromStreamTTF(InputStream, FontIdentifier, int, FontImportance)} instead
      *
      * @param path The path to the file to read the font data from.
@@ -87,7 +87,7 @@ public final class ImGuiFont {
      * be returned. Defaults to {@link FontImportance#MEDIUM} for registration budget. To specify a different
      * importance, use {@link #loadFromFileTTF(Path, FontIdentifier, int, FontImportance)} instead.
      *
-     * @apiNote If you want to load a font from an InputStream (e.g. resources), you may be interested in
+     * <p><b>API Note:</b> If you want to load a font from an InputStream (e.g. resources), you may be interested in
      *         {@link #loadFromStreamTTF(InputStream, FontIdentifier, int, FontImportance)} instead
      *
      * @param path The path to the file to read the font data from.
@@ -105,7 +105,7 @@ public final class ImGuiFont {
      * FontManager. May be used to load fonts from resources or other sources where a file path is not available.
      * If a font with the same name and size is already present in the FontManager, the existing font will be returned.
      *
-     * @apiNote If you want to load a font from a file outside of resources, you may be interested in
+     * <p><b>API Note:</b> If you want to load a font from a file outside of resources, you may be interested in
      *          {@link #loadFromFileTTF(Path, FontIdentifier, int, FontImportance)} instead.
      *
      * @param stream The InputStream to read the font data from. The stream will be closed after reading.
@@ -154,7 +154,7 @@ public final class ImGuiFont {
      * Defaults to {@link FontImportance#MEDIUM} for registration budget. To specify a different
      * importance, use {@link #loadFromStreamTTF(InputStream, FontIdentifier, int, FontImportance)} instead.
      *
-     * @apiNote If you want to load a font from a file outside of resources, you may be interested in
+     * <p><b>API Note:</b> If you want to load a font from a file outside of resources, you may be interested in
      *          {@link #loadFromFileTTF(Path, FontIdentifier, int, FontImportance)} instead.
      *
      * @param stream The InputStream to read the font data from. The stream will be closed after reading.
