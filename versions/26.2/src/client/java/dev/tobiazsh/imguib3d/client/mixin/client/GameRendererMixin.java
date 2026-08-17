@@ -46,7 +46,7 @@ public class GameRendererMixin {
 
         ImGuiImplementation.getInstance().draw(_ -> {
             for (ImGuiOverlay overlay : ImGuiOverlayManager.getInstance().getOverlaysSorted())
-                overlay.draw();
+                overlay.render();
         });
     }
 }
