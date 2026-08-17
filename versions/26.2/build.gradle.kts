@@ -1,3 +1,6 @@
+import jdk.jfr.internal.JVM.exclude
+import org.gradle.kotlin.dsl.invoke
+
 plugins {
     id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
     id("fabric-conventions")
@@ -59,12 +62,25 @@ repositories {
     // Add repositories to retrieve artifacts from in here.
 }
 
+@Suppress("UNCHECKED_CAST")
+val withImGui = project(":common").extra["withImGui"] as ((String) -> Unit, (String) -> Unit) -> Unit
+
 dependencies {
     "testmodImplementation"(sourceSets.getByName("client").output)
     "testmodImplementation"(sourceSets.main.get().output)
 
     api(project(":common"))
-    implementation(project(":common"))
+    include(project(":common"))
+
+    withImGui(
+        ::include
+    ) // Regular dependencies
+    { dep ->   // LWJGL dependency with exclusions applied
+        include(dep) {
+            exclude(group = "org.lwjgl")
+        }
+    }
+
     // To change the versions see the gradle.properties file
     minecraft("com.mojang:minecraft:$minecraftVersion")
     implementation("net.fabricmc:fabric-loader:$loaderVersion")
