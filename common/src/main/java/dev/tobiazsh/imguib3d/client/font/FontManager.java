@@ -20,7 +20,7 @@ public final class FontManager {
 
     private final RegistrationBudget budget = RegistrationBudget.defaultBudget();
 
-    public boolean needsDisposal = false;
+    private boolean needsDisposal = false;
 
     public static FontManager getInstance() {
         return INSTANCE;
