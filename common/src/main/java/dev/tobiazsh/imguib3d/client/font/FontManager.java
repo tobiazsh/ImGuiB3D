@@ -60,6 +60,9 @@ public final class FontManager {
      * Register a font to the ImGui context. This method should be called between frames.
      * Does not share the importance budget with other fonts, so it is guaranteed to be registered if called.
      *
+     * <p>If the font data inside the font future is invalid (ergo: null or empty), the font future will complete
+     * exceptionally with an {@link IllegalArgumentException} and the font will be removed from the queue.
+     *
      * @param atlas The ImFontAtlas to register the font to.
      * @param fontFuture The font future to register.
      */
@@ -68,6 +71,7 @@ public final class FontManager {
 
         if (fontData == null || fontData.length == 0) {
             fontFuture.completeExceptionally(new IllegalArgumentException("Font data is null or empty"));
+            queuedFonts.remove(fontFuture.getFontKey());
             return;
         }
 
