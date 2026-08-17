@@ -84,7 +84,6 @@ public final class ImGuiOverlayManager {
      * @param overlay The overlay to remove.
      */
     public void remove(final ImGuiOverlay overlay) {
-        overlay.dispose();
         remove(overlay.getId());
     }
 
