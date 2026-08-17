@@ -28,6 +28,9 @@ public final class TextureManager {
      * Registers a texture in the Map of USABLE textures. Do not register unuploaded or disposed textures.
      * Any match in the queued textures will be removed from the queue and added to the usable textures.
      *
+     * <p>If the texture is already registered, it will <b>not</b> be replaced.
+     * The existing texture will remain in the Map.
+     *
      * <p><b>API Note:</b> Only register textures that are not disposed.
      *          Disposed textures will be automatically removed from the manager.
      *
@@ -38,7 +41,7 @@ public final class TextureManager {
             throw new IllegalArgumentException("Cannot register an unuploaded or disposed texture");
 
         queuedTextures.remove(texture);
-        textures.put(texture.getTextureId(), texture);
+        textures.putIfAbsent(texture.getTextureId(), texture);
     }
 
     /**
