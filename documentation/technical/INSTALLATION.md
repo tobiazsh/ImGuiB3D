@@ -6,6 +6,6 @@ To use ImGuiB3D with your mod, you need two modules:
 
 ## Example – Version 26.2
 ```kotlin
-implementation("io.github.tobiazsh.imguib3d:common:1.0.0")
-implementation("io.github.tobiazsh.imguib3d:26.2:1.0.0")
+implementation("io.github.tobiazsh.imguib3d:common:1.0.1")
+implementation("io.github.tobiazsh.imguib3d:26.2:1.0.1")
 ```
