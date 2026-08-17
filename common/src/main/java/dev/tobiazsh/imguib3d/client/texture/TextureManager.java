@@ -47,11 +47,17 @@ public final class TextureManager {
     /**
      * Queues a texture for upload. The texture will be uploaded in the next frame.
      * Do not queue disposed textures.
+     *
+     * <p>If the provided texture has already been uploaded, it will not be queued again.
+     *
      * @param texture The texture to queue.
      */
     public void queueTexture(ImGuiTexture texture) {
         if (texture.isDisposed())
             throw new IllegalArgumentException("Cannot queue a disposed texture");
+
+        if (texture.isUploaded())
+            return;
 
         queuedTextures.add(texture);
     }
