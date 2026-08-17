@@ -1,9 +1,9 @@
-import jdk.jfr.internal.JVM.exclude
 import org.gradle.kotlin.dsl.invoke
 
 plugins {
     id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
     id("fabric-conventions")
+    id("maven-publish-conventions")
     java
     `java-library`
 }
@@ -136,17 +136,3 @@ tasks.jar {
 tasks.withType<Jar>().configureEach {
     archiveVersion.set("$modVersion+$minecraftVersion")
 }
-
-//// configure the maven publication
-//publishing {
-//    publications {
-//        create<MavenPublication>("mavenJava") {
-//            artifactId = project.property("archives_base_name").toString()
-//            from(components["java"])
-//        }
-//    }
-//
-//    repositories {
-//        // Add publishing repositories here.
-//    }
-//}

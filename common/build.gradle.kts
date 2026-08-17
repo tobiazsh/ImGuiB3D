@@ -1,5 +1,6 @@
 plugins {
     id("fabric-conventions")
+    id("maven-publish-conventions")
     `kotlin-dsl`
 }
 
