@@ -235,7 +235,7 @@ public class ImGuiTextureImpl implements ImGuiTexture {
 
     @Override
     public boolean isUsable() {
-        return isUploaded && isBound && !isDisposed;
+        return isUploaded && !isDisposed;
     }
 
     @Override
