@@ -72,7 +72,7 @@ public final class FontManager {
         }
 
         final ImFont font = atlas.addFontFromMemoryTTF(fontData, fontFuture.getFontKey().fontSize(), DEFAULT_FONT_CONFIG);
-        final ImGuiFont imguiFont = new ImGuiFont(font, fontFuture.getFontKey(), fontFuture.getFontData());
+        final ImGuiFont imguiFont = new     ImGuiFont(font, fontFuture.getFontKey(), fontFuture.getFontData());
 
         imguiFont.setLoaded(true);
         fontFuture.complete(imguiFont);
@@ -139,6 +139,8 @@ public final class FontManager {
 
     /**
      * Marks all registered fonts as unloaded.
+     *
+     * <p>Does <b>NOT</b> actually unload the fonts from the manager; only marks the fonts as unloaded.
      */
     public void unloadAll() {
         loadedFonts.forEach((_, imGuiFont) -> imGuiFont.setLoaded(false));
