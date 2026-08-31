@@ -4,6 +4,7 @@
 package dev.tobiazsh.imguib3d;
 
 import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlayManager;
+import dev.tobiazsh.imguib3d.overlay.AnotherTestOverlay;
 import dev.tobiazsh.imguib3d.overlay.TestOverlay;
 import net.fabricmc.api.ClientModInitializer;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +17,7 @@ public class TestModInitializer implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ImGuiOverlayManager.getInstance().add(new TestOverlay());
+        ImGuiOverlayManager.getInstance().add(new AnotherTestOverlay());
     }
 
     public static String getModId() {

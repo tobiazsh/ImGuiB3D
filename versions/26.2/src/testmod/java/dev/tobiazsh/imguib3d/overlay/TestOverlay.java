@@ -88,6 +88,7 @@ public class TestOverlay implements ImGuiOverlay {
         testBuffer.flip();
     }
 
+    @SuppressWarnings("DuplicatedCode")
     @Override
     public void createFonts() {
         if (robotoSlab == null) {
