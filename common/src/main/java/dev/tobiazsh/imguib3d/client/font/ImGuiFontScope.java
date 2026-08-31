@@ -64,7 +64,6 @@ public final class ImGuiFontScope {
      *     whether it got actually pushed or not.
      * </p>
      * @param font The font to push. If the font is null or not loaded, no push will happen.
-     * @param size The size of the font to push.
      */
     public void push(ImGuiFont font) {
         push(font, ImGui.getFontSize());
