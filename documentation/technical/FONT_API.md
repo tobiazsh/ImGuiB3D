@@ -83,7 +83,53 @@ To change a font's size, you first should dispose your font and then create a ne
 because the font size is baked into the font atlas and cannot be changed without rebuilding the font atlas. For
 information on how to dispose of a font, see [Disposal](#disposal).
 
-### Example
+### Example – 1.0.3 and later
+
+In versions 1.0.3, a new way of pushing/popping fonts was introduced. Instead of notoriously calling
+`if (font != null && font.isLoaded())` and storing the final push state in a boolean variable, you can now use the new
+`ImGuiFontScope` class to automatically have it handle the push/pop state for you. This is the new recommended way of
+pushing/popping fonts, as it is less error-prone and a ton more readable as well as convenient.
+
+`ImGuiFontScopes` should generally be created once and reused throughout the lifetime of your ImGui context. If you're
+doing multithreading, you should create a new `ImGuiFontScope` for each thread as it is not thread-safe.
+
+You can either use `ImGuiFontScope#push(ImGuiFont font, int size)` to push a font with a specific size or
+`ImGuiFontScope#push(ImGuiFont font)` to push a font with ImGui's current font size.
+
+```java
+public class TestOverlay implements ImGuiOverlay {
+    
+    private @Nullable ImGuiFont robotoFont;
+    private ImGuiFontScope imguiFontScope = ImGuiFontScope.create();
+    
+    @Override
+    public void draw() {
+        imguiFontScope.push(robotoFont, 16);
+        
+        if (ImGui.begin("Test Overlay")) {
+            ImGui.text("Hello, world!");
+        }
+        
+        imguiFontScope.pop();
+    }
+    
+    @Override
+    public void createFonts() {
+        if (robotoFont == null || robotoFont.isDisposed()) {
+            try {
+                ImGuiFont.loadFromStreamTTF(
+                        TestOverlay.class.getResourceAsStream("/assets/examplemod/fonts/Roboto-Regular.ttf"),
+                        FontIdentifier.of("examplemod", "Roboto Regular"), 16, FontImportance.LOW
+                ).thenAccept(font -> robotoFont = font);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load Roboto font", e);
+            }
+        }
+    }
+}
+```
+
+### Example – all versions
 
 ```java
 public class TestOverlay implements ImGuiOverlay {
