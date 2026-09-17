@@ -40,7 +40,7 @@ public class GameRendererMixin {
     private Minecraft minecraft;
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void render(CallbackInfo ci) {
+    private void imguib3d$render(CallbackInfo ci) {
         if (minecraft.gui.screen() instanceof final ImGuiDrawable drawable)
             ImGuiImplementation.getInstance().draw(drawable);
 

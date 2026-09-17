@@ -38,12 +38,12 @@ public class MinecraftMixin {
     private Window window;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void initImGui(GameConfig gameConfig, CallbackInfo ci) {
+    public void imguib3d$initImGui(GameConfig gameConfig, CallbackInfo ci) {
         ImGuiImplementation.getInstance().initialize(window.handle());
     }
 
     @Inject(method = "close", at = @At("HEAD"))
-    public void closeImGui(CallbackInfo ci) {
+    public void imguib3d$closeImGui(CallbackInfo ci) {
         ImGuiImplementation.getInstance().destroy();
     }
 }
