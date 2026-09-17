@@ -1,0 +1,138 @@
+import org.gradle.kotlin.dsl.invoke
+
+plugins {
+    id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
+    id("fabric-conventions")
+    id("maven-publish-conventions")
+    java
+    `java-library`
+}
+
+// Version-specific
+val loaderVersion = project.property("loader_version").toString()
+val fabricApiVersion = project.property("fabric_api_version").toString()
+val minecraftVersion = project.property("minecraft_version").toString()
+
+val testSrcSetName = "testmod"
+
+// Shared
+val modAuthor = rootProject.property("mod_author").toString()
+val modId = rootProject.property("mod_id").toString()
+val modName = rootProject.property("mod_name").toString()
+val modVersion = rootProject.property("mod_version").toString()
+
+version = modVersion
+group = rootProject.property("maven_group").toString()
+
+base {
+    archivesName = project.property("archives_base_name").toString()
+}
+
+loom {
+    splitEnvironmentSourceSets()
+    accessWidenerPath = file("src/main/resources/imguib3d.classtweaker")
+
+    mods {
+        register(modId) {
+            sourceSet(sourceSets.getByName(testSrcSetName))
+        }
+    }
+
+    runs {
+        create(testSrcSetName) {
+            client()
+            displayName = "TestMod"
+            generateRunConfig = true
+            sourceSet.set("testmod")
+        }
+    }
+}
+
+sourceSets {
+    val testmod = create(testSrcSetName) {
+        compileClasspath += sourceSets.main.get().compileClasspath +
+                sourceSets.getByName("client").compileClasspath + sourceSets.getByName("client").output
+
+        runtimeClasspath += sourceSets.main.get().runtimeClasspath +
+                sourceSets.getByName("client").runtimeClasspath + sourceSets.getByName("client").output
+    }
+}
+
+repositories {
+    // Add repositories to retrieve artifacts from in here.
+}
+
+@Suppress("UNCHECKED_CAST")
+val withImGui = project(":common").extra["withImGui"] as ((String) -> Unit, (String) -> Unit) -> Unit
+
+dependencies {
+    "testmodImplementation"(sourceSets.getByName("client").output)
+    "testmodImplementation"(sourceSets.main.get().output)
+
+    api(project(":common"))
+    include(project(":common"))
+
+    withImGui(
+        ::include
+    ) // Regular dependencies
+    { dep ->   // LWJGL dependency with exclusions applied
+        include(dep) {
+            exclude(group = "org.lwjgl")
+        }
+    }
+
+    // To change the versions see the gradle.properties file
+    minecraft("com.mojang:minecraft:$minecraftVersion")
+    implementation("net.fabricmc:fabric-loader:$loaderVersion")
+
+    implementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
+}
+
+// Configure resource processing in Kotlin DSL
+tasks.named<ProcessResources>("processResources") {
+    val modAuthors = modAuthor.split(",").map { it.trim() }
+
+    inputs.property("mod_version", modVersion)
+    inputs.property("minecraft_version", minecraftVersion)
+    inputs.property("loader_version", loaderVersion)
+    inputs.property("authors", modAuthors)
+    filteringCharset = "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand(
+            mapOf(
+                "mod_version" to modVersion,
+                "minecraft_version" to minecraftVersion,
+                "loader_version" to loaderVersion,
+                "authors" to modAuthors
+            )
+        )
+    }
+}
+
+val targetJavaVersion = 25
+tasks.withType<JavaCompile>().configureEach {
+    // ensure that the encoding is set to UTF-8
+    options.encoding = "UTF-8"
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
+        options.release.set(targetJavaVersion)
+    }
+}
+
+java {
+    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
+    }
+    withSourcesJar()
+}
+
+tasks.jar {
+    from("LICENSE") {
+        rename { fileName -> "${fileName}_${project.property("archives_base_name")}" }
+    }
+}
+
+tasks.withType<Jar>().configureEach {
+    archiveVersion.set("$modVersion+$minecraftVersion")
+}

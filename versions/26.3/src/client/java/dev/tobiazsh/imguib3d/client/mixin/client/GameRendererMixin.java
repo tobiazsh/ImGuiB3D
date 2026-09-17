@@ -2,7 +2,7 @@
 // https://github.com/Enaium/fabric-mod-ImGui
 //
 // Specifically, code was derived from:
-// https://github.com/Enaium/fabric-mod-ImGui/blob/2fe781209243484223931175b59d439872bea934/game/26.2/src/main/java/cn/enaium/fabric/imgui/mixin/MinecraftMixin.java
+// https://github.com/Enaium/fabric-mod-ImGui/blob/2fe781209243484223931175b59d439872bea934/game/26.2/src/main/java/cn/enaium/fabric/imgui/mixin/GameRendererMixin.java
 //
 // The original work is licensed under the Apache License 2.0.
 // A copy of the license is available at:
@@ -19,10 +19,13 @@
 
 package dev.tobiazsh.imguib3d.client.mixin.client;
 
-import com.mojang.blaze3d.platform.Window;
+import dev.tobiazsh.imguib3d.client.ImGuiDrawable;
 import dev.tobiazsh.imguib3d.client.ImGuiImplementation;
+import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlay;
+import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlayManager;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.main.GameConfig;
+import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,20 +33,20 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(Minecraft.class)
-public class MinecraftMixin {
-
+@Mixin(GameRenderer.class)
+public class GameRendererMixin {
     @Shadow
     @Final
-    private Window window;
+    private Minecraft minecraft;
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void imguib3d$initImGui(GameConfig gameConfig, CallbackInfo ci) {
-        ImGuiImplementation.getInstance().initialize(window.handle());
-    }
+    @Inject(method = "render", at = @At("RETURN"))
+    private void imguib3d$render(CallbackInfo ci) {
+        if (minecraft.gui.screen() instanceof final ImGuiDrawable drawable)
+            ImGuiImplementation.getInstance().draw(drawable);
 
-    @Inject(method = "close", at = @At("HEAD"))
-    public void imguib3d$closeImGui(CallbackInfo ci) {
-        ImGuiImplementation.getInstance().destroy();
+        ImGuiImplementation.getInstance().draw(_ -> {
+            for (ImGuiOverlay overlay : ImGuiOverlayManager.getInstance().getOverlaysSorted())
+                overlay.render();
+        });
     }
 }

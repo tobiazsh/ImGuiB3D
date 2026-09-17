@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.tobiazsh.imguib3d.client.mixin.client",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "GameRendererMixin",
+    "GlDeviceMixin",
+    "GpuDeviceMixin",
+    "MinecraftMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  },
+  "mixins": [
+    "SDLEventHandlerMixin"
+  ]
+}
