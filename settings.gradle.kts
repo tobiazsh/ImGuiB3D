@@ -17,6 +17,7 @@ rootProject.name = "ImGuiB3D"
 
 include("common")
 include("versions:26.2")
+include("versions:26.3")
 
 nmcpSettings {
     centralPortal {
