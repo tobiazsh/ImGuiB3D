@@ -189,6 +189,10 @@ public class ImGuiImpl extends ImGuiImplementation {
         commandEncoder.submit();
     }
 
+    public ImGuiImplSdl3 getSdl3Implementation() {
+        return imGuiImplSdl3;
+    }
+
     @Override
     public boolean isCompatibleWithEnvironment() {
         return ImGuiB3DClient.isMCVersionCompatible();

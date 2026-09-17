@@ -4,15 +4,18 @@
   "package": "dev.tobiazsh.imguib3d.client.mixin.client",
   "compatibilityLevel": "JAVA_25",
   "client": [
+    "GameRendererMixin",
     "GlDeviceMixin",
     "GpuDeviceMixin",
-    "MinecraftMixin",
-    "GameRendererMixin"
+    "MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "overwrites": {
     "requireAnnotations": true
-  }
+  },
+  "mixins": [
+    "SDLEventHandlerMixin"
+  ]
 }
