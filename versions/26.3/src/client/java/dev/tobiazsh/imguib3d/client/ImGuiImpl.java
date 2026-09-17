@@ -36,7 +36,7 @@ import imgui.ImDrawData;
 import imgui.ImGui;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
-import imgui.glfw.ImGuiImplGlfw;
+import imgui.sdl3.ImGuiImplSdl3;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.PreferredGraphicsApi;
 import org.jspecify.annotations.NonNull;
@@ -51,7 +51,7 @@ import java.util.Optional;
 
 @AutoService(ImGuiImplementation.class)
 public class ImGuiImpl extends ImGuiImplementation {
-    public @Nullable ImGuiImplGlfw imGuiImplGlfw;
+    public ImGuiImplSdl3 imGuiImplSdl3 = new ImGuiImplSdl3();
     public @Nullable ImGuiImplGl3 imGuiImplGl3;
     public @Nullable ImGuiImplBlaze3D imGuiImplBlaze3D;
 
@@ -77,19 +77,23 @@ public class ImGuiImpl extends ImGuiImplementation {
 
     @Override
     protected void init(long windowHandle) {
-        if (imGuiImplGlfw == null)
-            imGuiImplGlfw = new ImGuiImplGlfw();
+        imGuiImplSdl3.init(windowHandle);
 
-        imGuiImplGlfw.init(windowHandle, true);
-
-        if (imGuiImplGl3 != null)
+        if (imGuiImplGl3 != null) {
             imGuiImplGl3.init();
+            imGuiImplSdl3.initForOpenGL(windowHandle, 0);
+        } else {
+            imGuiImplSdl3.initForVulkan(windowHandle);
+        }
 
         // ImGuiImplBlaze3D is lazily initialized in newFrame()
     }
 
     @Override
     public void draw(ImGuiDrawable imGuiDrawable) {
+        if (!isInitialized)
+            return;
+
         final RenderTarget renderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
         final GpuDevice gpuDevice = RenderSystem.getDevice();
 
@@ -118,7 +122,7 @@ public class ImGuiImpl extends ImGuiImplementation {
             @NonNull final RenderTarget renderTarget,
             @NonNull final ImGuiDrawable imGuiDrawable
     ) {
-        if (imGuiImplGl3 == null || imGuiImplGlfw == null)
+        if (imGuiImplGl3 == null)
             return; // Just for safety in case the method is being called somewhere where it shouldn't be
 
         final GpuDeviceBackend gpuDeviceBackend = ((GpuDeviceAccessor) gpuDevice).imGuiB3D$getBackend();
@@ -136,7 +140,7 @@ public class ImGuiImpl extends ImGuiImplementation {
             imGuiImplGl3.destroyFontsTexture();
 
         imGuiImplGl3.newFrame();
-        imGuiImplGlfw.newFrame();
+        imGuiImplSdl3.newFrame();
 
         ImGui.newFrame();
 
@@ -160,7 +164,7 @@ public class ImGuiImpl extends ImGuiImplementation {
         final boolean rebuilt = rebuildFontAtlasIfNeeded(ImGui.getIO());
 
         imGuiImplBlaze3D.newFrame(rebuilt);
-        imGuiImplGlfw.newFrame();
+        imGuiImplSdl3.newFrame();
         ImGui.newFrame();
 
         imGuiDrawable.draw(ImGui.getIO());
@@ -207,11 +211,7 @@ public class ImGuiImpl extends ImGuiImplementation {
             imGuiImplBlaze3D = null;
         }
 
-        if (imGuiImplGlfw != null) {
-            imGuiImplGlfw.shutdown();
-            imGuiImplGlfw = null;
-        }
-
+        imGuiImplSdl3 = null;
         super.destroy();
     }
 }

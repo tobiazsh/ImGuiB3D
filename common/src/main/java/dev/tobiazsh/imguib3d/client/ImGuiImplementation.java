@@ -17,6 +17,8 @@ import java.util.ServiceLoader;
 
 public abstract class ImGuiImplementation implements CompatibilityChecker {
 
+    protected volatile boolean isInitialized = false;
+
     private static final @Nullable ImGuiImplementation INSTANCE =
             ServiceLoader.load(ImGuiImplementation.class)
                     .stream()
@@ -62,6 +64,7 @@ public abstract class ImGuiImplementation implements CompatibilityChecker {
         configureConfig(io);
 
         init(windowHandle);
+        isInitialized = true;
     }
 
     protected void configureFonts(final ImGuiIO io) {
@@ -103,7 +106,12 @@ public abstract class ImGuiImplementation implements CompatibilityChecker {
         io.setIniFilename(id == null ? null : id + ".ini");
     }
 
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
     public void destroy() {
+        isInitialized = false;
         ImPlot.destroyContext();
         ImGui.destroyContext();
     }
