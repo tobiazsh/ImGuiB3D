@@ -2,7 +2,7 @@
 // https://github.com/Enaium/fabric-mod-ImGui
 //
 // Specifically, code was derived from:
-// https://github.com/Enaium/fabric-mod-ImGui/blob/2fe781209243484223931175b59d439872bea934/game/26.2/src/main/java/cn/enaium/fabric/imgui/DefaultImGui.java
+// https://github.com/Enaium/fabric-mod-ImGui/blob/2fe781209243484223931175b59d439872bea934/game/26.3/src/main/java/cn/enaium/fabric/imgui/DefaultImGui.java
 //
 // The original work is licensed under the Apache License 2.0.
 // A copy of the license is available at:
@@ -43,7 +43,9 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.sdl.SDLKeyboard;
 import org.lwjgl.sdl.SDLVideo;
+import org.lwjgl.sdl.SDL_KeyboardEvent;
 
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +56,9 @@ public class ImGuiImpl extends ImGuiImplementation {
     public ImGuiImplSdl3 imGuiImplSdl3 = new ImGuiImplSdl3();
     public @Nullable ImGuiImplGl3 imGuiImplGl3;
     public @Nullable ImGuiImplBlaze3D imGuiImplBlaze3D;
+
+    private long currentWindowHandle = 0L;
+    private boolean textInputStarted;
 
     // Used by AutoService!
     public ImGuiImpl() {
@@ -78,6 +83,7 @@ public class ImGuiImpl extends ImGuiImplementation {
     @Override
     protected void init(long windowHandle) {
         imGuiImplSdl3.init(windowHandle);
+        this.currentWindowHandle = windowHandle;
 
         if (imGuiImplGl3 != null) {
             imGuiImplGl3.init();
@@ -93,6 +99,8 @@ public class ImGuiImpl extends ImGuiImplementation {
     public void draw(ImGuiDrawable imGuiDrawable) {
         if (!isInitialized)
             return;
+
+        startTextInputOnDemand(currentWindowHandle);
 
         final RenderTarget renderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
         final GpuDevice gpuDevice = RenderSystem.getDevice();
@@ -187,6 +195,27 @@ public class ImGuiImpl extends ImGuiImplementation {
         }
 
         commandEncoder.submit();
+    }
+
+    /**
+     * Nothing starts or stops the text input automatically, therefore we need to start or stop it on demand based on
+     * ImGui's state.
+     *
+     * @param windowHandle The handle of the SDL window to start or stop text input for.
+     */
+    private void startTextInputOnDemand(final long windowHandle) {
+        if (windowHandle == 0L)
+            return;
+
+        final boolean wantsTextInput = ImGui.getIO().getWantTextInput();
+
+        if (textInputStarted == wantsTextInput)
+            return;
+
+        textInputStarted = wantsTextInput;
+
+        if (wantsTextInput) SDLKeyboard.SDL_StartTextInput(windowHandle);
+        else SDLKeyboard.SDL_StopTextInput(windowHandle);
     }
 
     public ImGuiImplSdl3 getSdl3Implementation() {
