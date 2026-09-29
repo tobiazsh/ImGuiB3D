@@ -4,8 +4,8 @@ To use ImGuiB3D with your mod, you need two modules:
 - the common module, which contains the core functionality of ImGuiB3D
 - your version's module, which contains the specific implementation for your Minecraft version
 
-## Example – Version 26.2
+## Example – Version 26.3
 ```kotlin
-implementation("dev.tobiazsh.imguib3d:common:1.0.2")
-implementation("dev.tobiazsh.imguib3d:26.2:1.0.2")
+implementation("dev.tobiazsh.imguib3d:common:1.1.1")
+implementation("dev.tobiazsh.imguib3d:26.3:1.1.1")
 ```
