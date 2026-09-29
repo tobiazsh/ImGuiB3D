@@ -19,6 +19,7 @@
 package dev.tobiazsh.imguib3d.client.backend;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.renderpearl.api.GpuFormat;
 import com.mojang.renderpearl.api.buffers.GpuBuffer;
 import com.mojang.renderpearl.api.commands.CommandEncoder;
@@ -36,6 +37,8 @@ import imgui.ImFontAtlas;
 import imgui.ImGui;
 import imgui.ImVec4;
 import imgui.type.ImInt;
+import net.minecraft.client.renderer.BindGroupLayouts;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,7 +51,8 @@ import java.util.OptionalDouble;
 public class ImGuiImplBlaze3D {
 
     private static final Logger LOGGER = LogManager.getLogger("ImGuiB3D ImGuiImplBlaze3D");
-    private static final Identifier SHADER_ID = Identifier.fromNamespaceAndPath(ImGuiB3D.MOD_ID, "core/imgui");
+    private static final Identifier PIPELINE_LOCATION = Identifier.fromNamespaceAndPath(ImGuiB3D.MOD_ID, "imgui_pipeline");
+    private static final Identifier VANILLA_SHADER_ID = Identifier.withDefaultNamespace("core/position_tex_color");
 
     private static final VertexFormat IMGUI_VERTEX_FORMAT = VertexFormat.builder(0)
             .addAttribute("position", GpuFormat.RG32_FLOAT)
@@ -64,6 +68,7 @@ public class ImGuiImplBlaze3D {
                     .order(ByteOrder.nativeOrder());
 
     private @Nullable GpuBuffer projectionMatrixUniform;
+    private @Nullable GpuBuffer dynamicTransformsUniform;
 
     private @Nullable GpuBuffer indexBuffer;
     private @Nullable GpuBuffer vertexBuffer;
@@ -79,27 +84,31 @@ public class ImGuiImplBlaze3D {
         final GpuDevice gpuDevice = RenderSystem.getDevice();
 
         renderPipeline = RenderPipeline.builder()
-                .withLocation(SHADER_ID)
-                .withVertexShader(SHADER_ID)
-                .withFragmentShader(SHADER_ID)
-                .withVertexBinding(0, IMGUI_VERTEX_FORMAT)
+                .withLocation(PIPELINE_LOCATION)
+                .withVertexShader(VANILLA_SHADER_ID)
+                .withFragmentShader(VANILLA_SHADER_ID)
+                .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR)
                 .withPrimitiveTopology(PrimitiveTopology.TRIANGLES)
                 .withCull(false)
                 .withPolygonMode(PolygonMode.FILL)
+                .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+                .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+                .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+                .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
                 .withColorTargetState(new ColorTargetState(
                         new BlendFunction(
                                 BlendFactor.SRC_ALPHA, BlendFactor.ONE_MINUS_SRC_ALPHA,
                                 BlendFactor.ONE, BlendFactor.ONE_MINUS_SRC_ALPHA
                         )))
-                .withBindGroupLayout(
-                        BindGroupLayout.builder()
-                                .withUniform("projectionMatrix", UniformType.UNIFORM_BUFFER)
-                                .build())
-                .withBindGroupLayout(
-                        BindGroupLayout.builder()
-                                .withUniform("textureSampler", UniformType.COMBINED_IMAGE_SAMPLER)
-                                .build())
-                .build();
+//                .withBindGroupLayout(
+//                        BindGroupLayout.builder()
+//                                .withUniform("projectionMatrix", UniformType.UNIFORM_BUFFER)
+//                                .build())
+//                .withBindGroupLayout(
+//                        BindGroupLayout.builder()
+//                                .withUniform("textureSampler", UniformType.COMBINED_IMAGE_SAMPLER)
+//                                .build())
+               .build();
 
         compiledRenderPipeline = RenderSystem.getCompiledPipelineNullable(renderPipeline);
 
@@ -113,6 +122,12 @@ public class ImGuiImplBlaze3D {
                 () -> "ImGui Projection Matrix",
                 GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_COPY_DST,
                 64
+        );
+
+        dynamicTransformsUniform = gpuDevice.createBuffer(
+                () -> "ImGui Dynamic Transforms",
+                GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_COPY_DST,
+                128
         );
     }
 
@@ -178,7 +193,8 @@ public class ImGuiImplBlaze3D {
             return;
 
         renderPass.setPipeline(compiledRenderPipeline);
-        renderPass.setUniform("projectionMatrix", projectionMatrixUniform);
+        renderPass.setUniform("Projection", projectionMatrixUniform);
+        renderPass.setUniform("DynamicTransforms", dynamicTransformsUniform);
 
         final float clipOffX = drawData.getDisplayPosX();
         final float clipOffY = drawData.getDisplayPosY();
@@ -207,10 +223,10 @@ public class ImGuiImplBlaze3D {
                 final ImGuiTextureImpl texture = (ImGuiTextureImpl) TextureManager.getInstance().getTexture(textureId);
 
                 if (texture != null) {
-                    texture.bind("textureSampler", renderPass);
+                    texture.bind("Sampler0", renderPass);
                 } else {
                     // If texture is null, fall back to font atlas so it doesn't render invisible/garbage
-                    fontAtlasTexture.bind("textureSampler", renderPass);
+                    fontAtlasTexture.bind("Sampler0", renderPass);
                 }
 
                 final float clipMinX = (clipRect.x - clipOffX) * clipScaleX;
@@ -290,6 +306,10 @@ public class ImGuiImplBlaze3D {
                 commandListsCount
         );
 
+        uploadDynamicTransforms(
+                commandEncoder
+        );
+
         uploadProjectionMatrix(
                 drawData,
                 commandEncoder
@@ -337,6 +357,29 @@ public class ImGuiImplBlaze3D {
         projectionMatrixBuffer.flip();
 
         commandEncoder.writeToBuffer(projectionMatrixUniform.slice(), projectionMatrixBuffer);
+    }
+
+    private void uploadDynamicTransforms(
+            final CommandEncoder commandEncoder
+    ) {
+        ByteBuffer transformBuffer = ByteBuffer.allocateDirect(160).order(ByteOrder.nativeOrder());
+
+        transformBuffer.putFloat(1).putFloat(0).putFloat(0).putFloat(0);
+        transformBuffer.putFloat(0).putFloat(1).putFloat(0).putFloat(0);
+        transformBuffer.putFloat(0).putFloat(0).putFloat(1).putFloat(0);
+        transformBuffer.putFloat(0).putFloat(0).putFloat(0).putFloat(1);
+
+        transformBuffer.putFloat(1).putFloat(0).putFloat(0).putFloat(0);
+        transformBuffer.putFloat(0).putFloat(1).putFloat(0).putFloat(0);
+        transformBuffer.putFloat(0).putFloat(0).putFloat(1).putFloat(0);
+        transformBuffer.putFloat(0).putFloat(0).putFloat(0).putFloat(1);
+
+        transformBuffer.putFloat(1.0f).putFloat(1.0f).putFloat(1.0f).putFloat(1.0f);
+
+        transformBuffer.putFloat(0.0f).putFloat(0.0f).putFloat(0.0f).putFloat(0.0f);
+        transformBuffer.flip();
+
+        commandEncoder.writeToBuffer(dynamicTransformsUniform.slice(), transformBuffer);
     }
 
     /**
