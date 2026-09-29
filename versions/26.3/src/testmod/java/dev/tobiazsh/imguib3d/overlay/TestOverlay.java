@@ -11,6 +11,7 @@ import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlay;
 import dev.tobiazsh.imguib3d.client.texture.ImGuiTexture;
 import dev.tobiazsh.imguib3d.client.texture.ImGuiTextureImpl;
 import imgui.ImGui;
+import imgui.type.ImString;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
 
@@ -30,6 +31,8 @@ public class TestOverlay implements ImGuiOverlay {
     private @Nullable ImGuiFont sekuya;
 
     private @Nullable ByteBuffer testBuffer;
+
+    private ImString inputBuffer = new ImString(128);
 
     @Override
     public boolean isVisible() {
@@ -60,6 +63,8 @@ public class TestOverlay implements ImGuiOverlay {
 
             if (showImage)
                 ImGui.image(flowerTexture.getTextureId(), 512, 512);
+
+            ImGui.inputText("Input", inputBuffer);
 
             ImGui.end();
         }

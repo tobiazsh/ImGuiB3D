@@ -41,10 +41,10 @@ public class GameRendererMixin {
 
     @Inject(method = "render", at = @At("RETURN"))
     private void imguib3d$render(CallbackInfo ci) {
-        if (minecraft.gui.screen() instanceof final ImGuiDrawable drawable)
-            ImGuiImplementation.getInstance().draw(drawable);
+        ImGuiImplementation.getInstance().draw(io -> {
+            if (minecraft.gui.screen() instanceof final ImGuiDrawable drawable)
+                drawable.draw(io);
 
-        ImGuiImplementation.getInstance().draw(_ -> {
             for (ImGuiOverlay overlay : ImGuiOverlayManager.getInstance().getOverlaysSorted())
                 overlay.render();
         });

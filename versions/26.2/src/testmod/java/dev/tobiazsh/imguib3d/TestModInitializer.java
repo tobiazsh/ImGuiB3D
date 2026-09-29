@@ -4,9 +4,11 @@
 package dev.tobiazsh.imguib3d;
 
 import dev.tobiazsh.imguib3d.client.overlay.ImGuiOverlayManager;
+import dev.tobiazsh.imguib3d.command.TestCommand;
 import dev.tobiazsh.imguib3d.overlay.AnotherTestOverlay;
 import dev.tobiazsh.imguib3d.overlay.TestOverlay;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,6 +20,10 @@ public class TestModInitializer implements ClientModInitializer {
     public void onInitializeClient() {
         ImGuiOverlayManager.getInstance().add(new TestOverlay());
         ImGuiOverlayManager.getInstance().add(new AnotherTestOverlay());
+
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, _) -> {
+            TestCommand.register(dispatcher);
+        });
     }
 
     public static String getModId() {
