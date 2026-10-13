@@ -1,0 +1,105 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish to Maven Central
+        type: boolean
+        default: false
+
+jobs:
+  natives:
+    name: Build and package native binaries
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { runner: ubuntu-latest, dir: linux-x86_64 }
+          - { runner: windows-latest, dir: windows-x86_64 }
+          - { runner: windows-11-arm, dir: windows-aarch64, cmake_platform: ARM64 }
+          - { runner: macos-latest, dir: macos-aarch64 }
+    runs-on: ${{ matrix.runner }}
+    defaults:
+        run:
+            shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Pin CMake target architecture
+        if: matrix.cmake_platform
+        run: echo "CMAKE_GENERATOR_PLATFORM=${{ matrix.cmake_platform }}" >> "$GITHUB_ENV"
+
+      - name: Build natives
+        run: ./gradlew :common:copyNatives
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.dir }}
+          path: common/build/generated/native-sources/natives/${{ matrix.dir }}
+          if-no-files-found: error
+
+  package:
+    needs: natives
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # Each artifact lands in prebuilt/natives/<artifact name>/, and the names
+      # are the platform dirs, so this recreates natives/<os>-<arch>/<lib>.
+      - uses: actions/download-artifact@v4
+        with:
+          path: prebuilt/natives
+
+      - name: Verify every platform is present
+        run: |
+          for d in linux-x86_64 windows-x86_64 windows-aarch64 macos-aarch64; do
+            find "prebuilt/natives/$d" -type f | grep -q . || { echo "::error::No native for $d"; exit 1; }
+          done
+          
+      - name: Build
+        run: ./gradlew build -PskipNatives -PprebuiltNativesDir="$GITHUB_WORKSPACE/prebuilt"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jars
+          path: "**/build/libs/*.jar"
+
+  publish:
+    needs: package
+    if: github.event_name == 'workflow_dispatch' && inputs.publish && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_maven_central_username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+      ORG_GRADLE_PROJECT_maven_central_password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+      ORG_GRADLE_PROJECT_signing_key_base64: ${{ secrets.SIGNING_KEY }}
+      ORG_GRADLE_PROJECT_signing_password: ${{ secrets.SIGNING_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: prebuilt/natives
+      - name: Publish
+        run: ./gradlew publishAggregationToCentralPortal -PskipNatives -PprebuiltNativesDir="$GITHUB_WORKSPACE/prebuilt"
