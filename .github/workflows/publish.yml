@@ -1,0 +1,46 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: ID of a successful Build run to take the natives from
+        required: true
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    env:
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+      ORG_GRADLE_PROJECT_signing_key_base64: ${{ secrets.SIGNING_KEY }}
+      ORG_GRADLE_PROJECT_signing_password: ${{ secrets.SIGNING_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: prebuilt/natives
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: '*-*'
+
+      - name: Verify every platform is present
+        run: |
+          for d in linux-x86_64 windows-x86_64 windows-aarch64 macos-aarch64; do
+            find "prebuilt/natives/$d" -type f | grep -q . || { echo "::error::No native for $d"; exit 1; }
+          done
+
+      - name: Publish
+        run: ./gradlew publishAggregationToCentralPortal -PskipNatives -PprebuiltNativesDir="$GITHUB_WORKSPACE/prebuilt"
