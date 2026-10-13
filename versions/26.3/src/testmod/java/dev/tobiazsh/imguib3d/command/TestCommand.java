@@ -1,7 +1,7 @@
 package dev.tobiazsh.imguib3d.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import dev.tobiazsh.imguib3d.screen.TestScreen;
+import dev.tobiazsh.imguib3d.screen.ImplTestScreen;
 import net.minecraft.client.Minecraft;
 
 import net.minecraft.commands.CommandSourceStack;
@@ -13,7 +13,7 @@ public class TestCommand {
                 Commands.literal("testscr")
                         .executes(context -> {
                             // Open the TestScreen when the command is executed
-                            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreenAndShow(new TestScreen()));
+                            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreenAndShow(new ImplTestScreen()));
                             return 1;
                         })
         );

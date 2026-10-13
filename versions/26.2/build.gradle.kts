@@ -68,6 +68,7 @@ val withImGui = project(":common").extra["withImGui"] as ((String) -> Unit, (Str
 dependencies {
     "testmodImplementation"(sourceSets.getByName("client").output)
     "testmodImplementation"(sourceSets.main.get().output)
+    "testmodImplementation"(project(":commonTestmod"))
 
     api(project(":common"))
     include(project(":common"))
