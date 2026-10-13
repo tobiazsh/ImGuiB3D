@@ -48,14 +48,14 @@ loom {
     }
 }
 
-sourceSets {
-    val testmod = create(testSrcSetName) {
-        compileClasspath += sourceSets.main.get().compileClasspath +
-                sourceSets.getByName("client").compileClasspath + sourceSets.getByName("client").output
+sourceSets.register(testSrcSetName) {
+    compileClasspath += sourceSets.main.get().compileClasspath +
+            sourceSets.getByName("client").compileClasspath +
+            sourceSets.getByName("client").output
 
-        runtimeClasspath += sourceSets.main.get().runtimeClasspath +
-                sourceSets.getByName("client").runtimeClasspath + sourceSets.getByName("client").output
-    }
+    runtimeClasspath += sourceSets.main.get().runtimeClasspath +
+            sourceSets.getByName("client").runtimeClasspath +
+            sourceSets.getByName("client").output
 }
 
 repositories {
@@ -68,6 +68,7 @@ val withImGui = project(":common").extra["withImGui"] as ((String) -> Unit, (Str
 dependencies {
     "testmodImplementation"(sourceSets.getByName("client").output)
     "testmodImplementation"(sourceSets.main.get().output)
+    "testmodImplementation"(project(":commonTestmod"))
 
     api(project(":common"))
     include(project(":common"))
