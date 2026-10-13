@@ -6,6 +6,11 @@
 /buildSrc/build/classes/kotlin/main/
 /common/build/
 /common/build/classes/java/main/
+/common/src/main/native/cmake_install.cmake
+/common/src/main/native/CMakeCache.txt
+/common/src/main/native/Makefile
+/common/src/main/native/natives/
+/common/src/main/native/CMakeFiles/
 /versions/26.2/build/
 /versions/26.2/build/classes/java/client/
 /versions/26.2/build/classes/java/main/
