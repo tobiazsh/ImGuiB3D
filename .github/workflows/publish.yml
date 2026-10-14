@@ -43,4 +43,4 @@ jobs:
           done
 
       - name: Publish
-        run: ./gradlew publishAggregationToCentralPortal -PskipNatives -PprebuiltNativesDir="$GITHUB_WORKSPACE/prebuilt"
+        run: ./gradlew publishAggregationToCentralPortal --stacktrace -PskipNatives -PprebuiltNativesDir="$GITHUB_WORKSPACE/prebuilt"
